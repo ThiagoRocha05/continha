@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#4ECDC4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Continhas">
+<title>Continhas 🔢</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --coral:    #FF6B6B;
+    --yellow:   #FFE66D;
+    --teal:     #4ECDC4;
+    --purple:   #A855F7;
+    --blue:     #60A5FA;
+    --green:    #4ADE80;
+    --orange:   #FB923C;
+    --pink:     #F472B6;
+    --dark:     #14162B;
+    --card:     #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--dark);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.25;
+    animation: blobFloat 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .blob1 { width: 400px; height: 400px; background: var(--teal);   top: -100px; left: -100px; animation-delay: 0s; }
+  .blob2 { width: 300px; height: 300px; background: var(--purple); bottom: -80px; right: -80px; animation-delay: -3s; }
+  .blob3 { width: 250px; height: 250px; background: var(--orange); top: 40%; left: 50%; animation-delay: -5s; }
+  @keyframes blobFloat {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33%      { transform: translate(30px,-20px) scale(1.05); }
+    66%      { transform: translate(-20px,30px) scale(0.95); }
+  }
+
+  .star-field { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .star {
+    position: absolute; width: 4px; height: 4px;
+    background: white; border-radius: 50%; opacity: 0;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0; transform: scale(1); }
+    50%      { opacity: 0.7; transform: scale(1.5); }
+  }
+
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    transition: opacity 0.4s, transform 0.4s;
+    z-index: 10;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.95); }
+
+  /* ====== HOME ====== */
+  #home { gap: 22px; }
+  .logo-wrap { text-align: center; animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both; }
+  .logo-emoji { font-size: clamp(76px, 17vw, 120px); display: block; animation: wiggle 2s ease-in-out infinite; }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-5deg) scale(1); }
+    50%      { transform: rotate(5deg) scale(1.05); }
+  }
+  .logo-title {
+    font-family: 'ABeeZee', sans-serif;
+    font-size: clamp(48px, 13vw, 88px);
+    background: linear-gradient(135deg, var(--teal), var(--blue), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1;
+    filter: drop-shadow(0 4px 12px rgba(78,205,196,0.4));
+  }
+  .logo-sub { color: rgba(255,255,255,0.7); font-size: clamp(15px, 3.8vw, 21px); font-weight: 700; margin-top: 4px; }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0); }
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: var(--dark);
+    font-family: 'ABeeZee', sans-serif;
+    font-size: clamp(22px, 5.5vw, 34px);
+    padding: 17px 56px;
+    border: none; border-radius: 100px; cursor: pointer;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.3), 0 12px 30px rgba(255,140,0,0.4);
+    transition: all 0.1s;
+    animation: popIn 0.6s 0.3s cubic-bezier(.34,1.56,.64,1) both;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+    border-radius: inherit;
+  }
+  .btn-primary:active { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 6px 15px rgba(255,140,0,0.4); }
+
+  .phase-select { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 480px; animation: popIn 0.6s 0.5s cubic-bezier(.34,1.56,.64,1) both; }
+  .phase-btn {
+    background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); color: white;
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(13px, 3.2vw, 16px);
+    padding: 10px 18px; border-radius: 50px; cursor: pointer; transition: all 0.2s;
+  }
+  .phase-btn:hover, .phase-btn.active { background: rgba(255,255,255,0.2); border-color: var(--teal); color: var(--teal); transform: scale(1.05); }
+
+  /* ====== GAME ====== */
+  #game { gap: 0; padding: 0; justify-content: flex-start; overflow-y: auto; overflow-x: hidden; }
+  .hud { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 0; flex-shrink: 0; gap: 6px; }
+  .hud-home-btn {
+    background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%; width: 44px; height: 44px; font-size: 22px; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .hud-home-btn:active { background: rgba(255,255,255,0.25); transform: scale(0.9); }
+  .hud-stars {
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(18px, 4.5vw, 26px);
+    color: var(--yellow); display: flex; align-items: center; gap: 6px;
+  }
+  .hud-level {
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(12px, 3.2vw, 16px);
+    color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);
+    padding: 6px 14px; border-radius: 50px; white-space: nowrap;
+  }
+  .hud-lives { display: flex; gap: 4px; font-size: clamp(18px, 4.5vw, 24px); }
+
+  #exitConfirm {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center; z-index: 200;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  #exitConfirm.visible { opacity: 1; pointer-events: all; }
+  .exit-card { background: white; border-radius: 28px; padding: 36px 40px; text-align: center; max-width: 340px; width: 90%; animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1); }
+  .exit-card .exit-emoji { font-size: 60px; display: block; margin-bottom: 8px; }
+  .exit-card h2 { font-family: 'ABeeZee', sans-serif; font-size: 28px; color: #1E1B4B; margin-bottom: 6px; }
+  .exit-card p { color: #666; font-size: 16px; font-weight: 700; margin-bottom: 24px; }
+  .exit-btns { display: flex; gap: 12px; }
+  .exit-btn-yes, .exit-btn-no {
+    flex: 1; padding: 14px; color: white; font-family: 'ABeeZee', sans-serif;
+    font-size: 20px; border: none; border-radius: 16px; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: all 0.1s;
+  }
+  .exit-btn-yes { background: linear-gradient(135deg, var(--coral), #ff4444); }
+  .exit-btn-no { background: linear-gradient(135deg, var(--green), var(--teal)); }
+  .exit-btn-yes:active, .exit-btn-no:active { transform: translateY(3px); box-shadow: none; }
+
+  .progress-bar-wrap { width: 100%; padding: 8px 16px; flex-shrink: 0; }
+  .progress-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--teal), var(--blue));
+    border-radius: 10px; transition: width 0.5s ease; box-shadow: 0 0 10px rgba(78,205,196,0.6);
+  }
+
+  .game-area {
+    flex: 1; width: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 8px 16px 16px; gap: 14px; overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .question-card {
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(20px); border-radius: 24px; padding: 18px 20px;
+    width: 100%; text-align: center; position: relative; flex-shrink: 0;
+  }
+  .question-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .theme-emoji { font-size: clamp(40px, 10vw, 64px); display: block; margin-bottom: 4px; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .mode-tag {
+    display: inline-block; font-size: clamp(11px, 2.5vw, 13px); font-weight: 900;
+    text-transform: uppercase; letter-spacing: 2px; padding: 4px 12px; border-radius: 50px; margin-bottom: 10px;
+  }
+  .mode-1 { background: rgba(74,222,128,0.3); color: #86EFAC; border: 1px solid rgba(74,222,128,0.4); }
+  .mode-2 { background: rgba(96,165,250,0.3); color: #93C5FD; border: 1px solid rgba(96,165,250,0.4); }
+  .mode-3 { background: rgba(168,85,247,0.3); color: #E879F9; border: 1px solid rgba(168,85,247,0.4); }
+  .mode-4 { background: rgba(251,146,60,0.3); color: #FED7AA; border: 1px solid rgba(251,146,60,0.4); }
+
+  .question-label { color: rgba(255,255,255,0.65); font-size: clamp(14px, 3.4vw, 18px); font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+
+  /* Object counting / visual addition */
+  .objects-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(6px, 2vw, 12px); margin: 10px 0; }
+  .object-group { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px; max-width: 150px; }
+  .obj-emoji { font-size: clamp(24px, 7vw, 40px); line-height: 1; }
+  .op-symbol { font-family: 'ABeeZee', sans-serif; font-size: clamp(28px, 7vw, 44px); color: var(--yellow); flex-shrink: 0; }
+  .eq-box {
+    width: clamp(48px, 12vw, 68px); height: clamp(48px, 12vw, 68px);
+    border-radius: 14px; background: rgba(255,255,255,0.08); border: 3px dashed rgba(255,255,255,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(22px, 6vw, 34px); color: var(--teal); flex-shrink: 0;
+  }
+
+  /* Equation with number boxes (horizontal) */
+  .equation-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(6px, 2vw, 12px); margin: 10px 0; }
+  .num-box {
+    min-width: clamp(46px, 12vw, 68px); height: clamp(46px, 12vw, 68px); padding: 0 6px;
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(20px, 6vw, 32px); flex-shrink: 0;
+  }
+  .num-box.filled { background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.2); }
+  .num-box.blank { background: rgba(255,255,255,0.05); border: 3px dashed var(--teal); color: var(--teal); }
+
+  /* Vertical continhas (worksheet style) */
+  .vertical-op {
+    display: inline-flex; flex-direction: column; align-items: stretch;
+    font-family: 'Nunito', sans-serif; font-weight: 900; color: white;
+    font-size: clamp(30px, 9vw, 48px); margin: 8px auto;
+  }
+  .vertical-op .vrow { display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 120px; }
+  .vertical-op .vrow.second { border-bottom: 5px solid rgba(255,255,255,0.55); padding-bottom: 8px; margin-bottom: 8px; }
+  .vertical-op .vop { color: var(--yellow); font-size: 0.8em; }
+  .vertical-op .vans { color: var(--teal); }
+
+  .compare-row { display: flex; gap: 18px; justify-content: center; margin: 12px 0; flex-wrap: wrap; }
+  .compare-card {
+    background: rgba(255,255,255,0.08); border: 3px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 18px 28px; font-family: 'Nunito', sans-serif;
+    font-weight: 900; font-size: clamp(30px, 9vw, 50px); color: white; min-width: 90px; text-align: center;
+  }
+
+  .word-text {
+    font-family: 'Nunito', sans-serif; font-size: clamp(16px, 4vw, 20px); font-weight: 700;
+    color: white; line-height: 1.5; padding: 4px 4px 8px;
+  }
+
+  /* Answer options */
+  .options-area { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; flex-shrink: 0; }
+  .answer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 2.5vw, 16px); width: 100%; max-width: 420px; }
+  .answer-grid.two-col-only { grid-template-columns: repeat(2, 1fr); }
+  .answer-btn {
+    width: 100%; min-height: clamp(58px, 15vw, 78px); padding: 10px 12px;
+    border-radius: 18px; border: 3px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08); color: white;
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(22px, 6.5vw, 34px);
+    cursor: pointer; transition: all 0.15s; box-shadow: 0 5px 0 rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .answer-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+  .answer-btn.correct-choice { background: rgba(74,222,128,0.3); border-color: var(--green); color: var(--green); animation: correctFlash 0.5s ease forwards; }
+  .answer-btn.wrong-choice { background: rgba(255,107,107,0.25); border-color: var(--coral); color: var(--coral); pointer-events: none; animation: wrongFlash 0.4s ease forwards; }
+  .answer-btn.disabled { pointer-events: none; opacity: 0.4; }
+  @keyframes correctFlash {
+    0%   { background: rgba(74,222,128,0.3); border-color: var(--green); color: var(--green); transform: scale(1.08); }
+    100% { background: rgba(74,222,128,0.18); transform: scale(1); }
+  }
+  @keyframes wrongFlash {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-8px); background: rgba(255,107,107,0.3); border-color: var(--coral); }
+    75%     { transform: translateX(8px); }
+  }
+
+  /* Streak toast */
+  .streak-toast {
+    position: fixed; top: 90px; left: 50%; transform: translateX(-50%) translateY(-10px);
+    background: linear-gradient(135deg, var(--orange), var(--coral)); color: white;
+    font-family: 'ABeeZee', sans-serif; font-size: 16px; padding: 8px 20px; border-radius: 50px;
+    z-index: 150; opacity: 0; pointer-events: none; transition: all 0.3s; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    white-space: nowrap;
+  }
+  .streak-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Feedback overlay */
+  #feedback { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
+  .feedback-card { background: white; border-radius: 32px; padding: 40px 48px; text-align: center; max-width: 380px; width: 90%; animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1); }
+  .feedback-emoji { font-size: 80px; display: block; margin-bottom: 12px; }
+  .feedback-title { font-family: 'ABeeZee', sans-serif; font-size: 36px; margin-bottom: 8px; }
+  .feedback-title.win  { color: var(--green); }
+  .feedback-title.lose { color: var(--coral); }
+  .feedback-sub { color: #666; font-size: 18px; font-weight: 700; margin-bottom: 24px; }
+  .feedback-btn {
+    background: linear-gradient(135deg, var(--green), var(--teal)); color: var(--dark);
+    font-family: 'ABeeZee', sans-serif; font-size: 22px; padding: 13px 36px; border: none;
+    border-radius: 50px; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.25); width: 100%; transition: all 0.1s;
+  }
+  .feedback-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
+
+  /* Result */
+  #result { gap: 20px; }
+  .result-card {
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px); border-radius: 32px; padding: 40px; text-align: center;
+    max-width: 460px; width: 100%; animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .result-emoji { font-size: 90px; display: block; margin-bottom: 8px; }
+  .result-title {
+    font-family: 'ABeeZee', sans-serif; font-size: clamp(34px, 8.5vw, 54px);
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .result-score { font-family: 'ABeeZee', sans-serif; font-size: clamp(18px, 5vw, 26px); color: white; margin: 12px 0 8px; }
+  .result-stars { font-size: 48px; }
+
+  .particle { position: fixed; pointer-events: none; font-size: 28px; animation: particleFly 1.2s ease-out forwards; z-index: 100; }
+  @keyframes particleFly {
+    from { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+    to   { opacity: 0; transform: translateY(-200px) rotate(360deg) scale(0.3); }
+  }
+  .confetti-piece { position: fixed; width: 12px; height: 12px; pointer-events: none; z-index: 100; animation: confettiFall 2s ease-in forwards; }
+  @keyframes confettiFall {
+    from { opacity: 1; transform: translateY(-50px) rotate(0deg); }
+    to   { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-12px); }
+    40%,80% { transform: translateX(12px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  .best-score { color: rgba(255,255,255,0.5); font-size: 15px; font-weight: 700; animation: popIn 0.6s 0.7s cubic-bezier(.34,1.56,.64,1) both; text-align: center; }
+  .best-score span { color: var(--teal); }
+
+  * { font-style: normal !important; }
+
+  /* ====== RESPONSIVE ====== */
+  @media (min-width: 640px) {
+    .hud { padding: 16px 24px 0; }
+    .progress-bar-wrap { padding: 10px 24px; }
+    .game-area { padding: 10px 24px 20px; gap: 18px; }
+    .theme-emoji { font-size: 78px; }
+    .question-card { padding: 22px 30px; }
+    .answer-grid { max-width: 480px; }
+    .answer-btn { min-height: 82px; font-size: 32px; }
+    .num-box { min-width: 72px; height: 72px; font-size: 34px; }
+  }
+  @media (min-height: 400px) and (max-height: 700px) and (min-width: 600px) {
+    #home { gap: 12px; }
+    .logo-emoji { font-size: 54px !important; }
+    .logo-title { font-size: 46px !important; }
+    .logo-sub { font-size: 15px; margin-top: 2px; }
+    .btn-primary { font-size: 22px; padding: 14px 48px; }
+    .phase-btn { font-size: 13px; padding: 8px 16px; }
+    .best-score { font-size: 13px; }
+  }
+  @media (min-width: 960px) {
+    #game { align-items: center; }
+    .hud { max-width: 860px; padding: 20px 32px 0; }
+    .progress-bar-wrap { max-width: 860px; padding: 10px 32px; }
+    .game-area {
+      max-width: 860px; flex-direction: row; align-items: flex-start;
+      justify-content: center; padding: 14px 32px 24px; gap: 26px;
+    }
+    .question-card { flex: 0 0 400px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding: 30px 34px; }
+    .options-area { flex: 1; align-self: stretch; justify-content: center; }
+    .theme-emoji { font-size: 92px; }
+    .answer-grid { max-width: 440px; }
+    .answer-btn { min-height: 84px; font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+<div class="star-field" id="starField"></div>
+
+<!-- ===== HOME ===== -->
+<div class="screen" id="home">
+  <div class="logo-wrap">
+    <span class="logo-emoji">🔢</span>
+    <div class="logo-title">Continhas</div>
+    <div class="logo-sub">aprenda brincando com números!</div>
+  </div>
+  <button class="btn-primary" onclick="startGame()">▶ JOGAR!</button>
+  <div class="phase-select">
+    <button class="phase-btn active" onclick="selectPhase(this,1)">🍎 Nível 1</button>
+    <button class="phase-btn" onclick="selectPhase(this,2)">🔢 Nível 2</button>
+    <button class="phase-btn" onclick="selectPhase(this,3)">🧠 Nível 3</button>
+    <button class="phase-btn" onclick="selectPhase(this,4)">🏆 Nível 4</button>
+  </div>
+  <div class="best-score" id="bestScoreDisplay">Melhor pontuação: <span>0</span> ⭐</div>
+</div>
+
+<!-- ===== GAME ===== -->
+<div class="screen hidden" id="game">
+  <div class="hud">
+    <div class="hud-stars">⭐ <span id="scoreDisplay">0</span></div>
+    <button class="hud-home-btn" onclick="confirmExit()">🏠</button>
+    <div class="hud-level" id="levelDisplay">Nível 1 · Q1/8</div>
+    <div class="hud-lives" id="livesDisplay">❤️❤️❤️</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="game-area">
+    <div class="question-card" id="questionCard">
+      <span class="theme-emoji" id="themeEmoji">🔢</span>
+      <div class="mode-tag mode-1" id="modeTag">Contando</div>
+      <div class="question-label" id="questionLabel">Quantos há?</div>
+      <div id="questionBody"></div>
+    </div>
+    <div class="options-area">
+      <div class="answer-grid" id="answerGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FEEDBACK ===== -->
+<div class="screen hidden" id="feedback">
+  <div class="feedback-card" id="feedbackCard">
+    <span class="feedback-emoji" id="feedbackEmoji">🎉</span>
+    <div class="feedback-title" id="feedbackTitle">Acertou!</div>
+    <div class="feedback-sub" id="feedbackSub">Muito bem!</div>
+    <button class="feedback-btn" onclick="nextQuestion()">Próxima →</button>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div class="screen hidden" id="result">
+  <div class="result-card">
+    <span class="result-emoji" id="resultEmoji">🏆</span>
+    <div class="result-title" id="resultTitle">Parabéns!</div>
+    <div class="result-score" id="resultScore">Você fez 40 pontos!</div>
+    <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+  </div>
+  <button class="result-next-btn btn-primary" onclick="goHome()" style="background:linear-gradient(135deg, var(--purple), var(--blue)); color:white; font-size:clamp(18px,4.5vw,24px); padding:14px 44px;">🏠 Início</button>
+  <button class="btn-primary" onclick="startGame()">▶ Jogar de Novo!</button>
+</div>
+
+<!-- EXIT CONFIRM -->
+<div id="exitConfirm">
+  <div class="exit-card">
+    <span class="exit-emoji">🏠</span>
+    <h2>Sair do jogo?</h2>
+    <p>Seu progresso será perdido!</p>
+    <div class="exit-btns">
+      <button class="exit-btn-yes" onclick="doExit()">Sair</button>
+      <button class="exit-btn-no" onclick="closeExit()">Continuar!</button>
+    </div>
+  </div>
+</div>
+
+<div class="streak-toast" id="streakToast"></div>
+
+<script>
+// ============================================================
+//  DATA / CONFIG
+// ============================================================
+const CONFIG = {
+  1: { name:'Nível 1 · Contando',   questions: 8,  icon:'🍎', modeClass:'mode-1' },
+  2: { name:'Nível 2 · Continhas',  questions: 10, icon:'🔢', modeClass:'mode-2' },
+  3: { name:'Nível 3 · Desafio',    questions: 10, icon:'🧠', modeClass:'mode-3' },
+  4: { name:'Nível 4 · Problemas',  questions: 10, icon:'🏆', modeClass:'mode-4' },
+};
+
+const OBJ_POOL = ['🍎','🍌','🍇','🍓','🍊','🍉','⭐','🎈','🚗','⚽','🐱','🐶','🦆','🐸','🌸','🧸','🍬','🍪','🎁','🐝','🦋','🐟','🌟','🍭'];
+
+const WORD_ITEMS = [
+  { item:'bolinhas de gude', emoji:'🔵', verb:'coleciona', g:'f' },
+  { item:'figurinhas',       emoji:'🎴', verb:'coleciona', g:'f' },
+  { item:'balas',            emoji:'🍬', verb:'ganhou',    g:'f' },
+  { item:'brinquedos',       emoji:'🧸', verb:'tem',       g:'m' },
+  { item:'lápis de cor',     emoji:'🖍️', verb:'tem',       g:'m' },
+  { item:'estrelinhas',      emoji:'⭐', verb:'ganhou',    g:'f' },
+  { item:'bonecos',          emoji:'🤖', verb:'tem',       g:'m' },
+  { item:'flores',           emoji:'🌸', verb:'colheu',    g:'f' },
+  { item:'passarinhos',      emoji:'🐦', verb:'viu',       g:'m' },
+  { item:'pirulitos',        emoji:'🍭', verb:'ganhou',    g:'m' },
+];
+const NAMES = [
+  { name:'Helena',   g:'f' }, { name:'Valentina', g:'f' }, { name:'Luís', g:'m' },
+  { name:'Rafael',   g:'m' }, { name:'Karol',     g:'f' }, { name:'Ana',  g:'f' },
+  { name:'Pedro',    g:'m' }, { name:'João',      g:'m' }, { name:'Marina', g:'f' },
+  { name:'Théo',     g:'m' },
+];
+
+function rnd(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[rnd(0, arr.length-1)]; }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function distractors(correct, count, minV, maxV){
+  const set = new Set([correct]);
+  const tries = [1,-1,2,-2,3,-3,4,-4,5,-5];
+  shuffle(tries);
+  for(const d of tries){
+    if(set.size >= count+1) break;
+    const v = correct + d;
+    if(v>=minV && v<=maxV && v!==correct) set.add(v);
+  }
+  while(set.size < count+1){
+    const v = rnd(minV, maxV);
+    if(v!==correct) set.add(v);
+  }
+  return shuffle([...set]);
+}
+
+// ============================================================
+//  QUESTION GENERATION
+// ============================================================
+function generateQuestion(phase){
+  if(phase===1) return genPhase1();
+  if(phase===2) return genPhase2();
+  if(phase===3) return genPhase3();
+  if(phase===4) return genPhase4();
+}
+
+function genPhase1(){
+  const mode = pick(['count','count','addvisual','addvisual','addvisual']);
+  const emoji = pick(OBJ_POOL);
+  if(mode==='count'){
+    const n = rnd(2,9);
+    const correct = n;
+    const opts = distractors(correct, 3, 1, 10);
+    return {
+      icon: emoji, modeTag:'Contando', label:'Quantos há? Conte com carinho!',
+      body: `<div class="objects-row"><div class="object-group">${Array.from({length:n}).map(()=>`<span class="obj-emoji">${emoji}</span>`).join('')}</div></div>`,
+      options: opts, correct
+    };
+  } else {
+    const n1 = rnd(1,5), n2 = rnd(1,4);
+    const correct = n1+n2;
+    const opts = distractors(correct, 3, 1, 10);
+    const grp = (n)=> Array.from({length:n}).map(()=>`<span class="obj-emoji">${emoji}</span>`).join('');
+    return {
+      icon: emoji, modeTag:'Somando', label:'Quantos há ao todo?',
+      body: `<div class="objects-row">
+        <div class="object-group">${grp(n1)}</div>
+        <span class="op-symbol">+</span>
+        <div class="object-group">${grp(n2)}</div>
+        <span class="op-symbol">=</span>
+        <div class="eq-box">?</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+}
+
+function genPhase2(){
+  const mode = pick(['add','add','sub','sub']);
+  if(mode==='add'){
+    const a = rnd(1,9), b = rnd(1,9);
+    const correct = a+b;
+    const opts = distractors(correct, 3, 0, 18);
+    return {
+      icon:'➕', modeTag:'Somando', label:'Resolva a continha!',
+      body: `<div class="vertical-op">
+        <div class="vrow">${a}</div>
+        <div class="vrow second"><span class="vop">+</span>${b}</div>
+      </div>`,
+      options: opts, correct
+    };
+  } else {
+    const minuend = rnd(6,18);
+    const sub = rnd(1, Math.min(9, minuend-1));
+    const correct = minuend - sub;
+    const opts = distractors(correct, 3, 0, 18);
+    return {
+      icon:'➖', modeTag:'Subtraindo', label:'Resolva a continha!',
+      body: `<div class="vertical-op">
+        <div class="vrow">${minuend}</div>
+        <div class="vrow second"><span class="vop">−</span>${sub}</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+}
+
+function genPhase3(){
+  const mode = pick(['triple','twodigitadd','twodigitsub','sequence']);
+  if(mode==='triple'){
+    const a=rnd(1,8), b=rnd(1,8), c=rnd(1,8);
+    const correct = a+b+c;
+    const opts = distractors(correct, 3, 0, 30);
+    return {
+      icon:'🧮', modeTag:'Soma tripla', label:'Some os três números!',
+      body: `<div class="equation-row">
+        <div class="num-box filled">${a}</div><span class="op-symbol">+</span>
+        <div class="num-box filled">${b}</div><span class="op-symbol">+</span>
+        <div class="num-box filled">${c}</div><span class="op-symbol">=</span>
+        <div class="num-box blank">?</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+  if(mode==='twodigitadd'){
+    let a,b;
+    do{ a=rnd(10,49); b=rnd(10,40); } while( (a%10)+(b%10) >= 10 );
+    const correct = a+b;
+    const opts = distractors(correct, 3, 10, 99);
+    return {
+      icon:'➕', modeTag:'Soma grande', label:'Resolva a continha!',
+      body: `<div class="vertical-op">
+        <div class="vrow">${a}</div>
+        <div class="vrow second"><span class="vop">+</span>${b}</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+  if(mode==='twodigitsub'){
+    let a,b;
+    do{ a=rnd(21,89); b=rnd(10, a-1); } while( (a%10) < (b%10) );
+    const correct = a-b;
+    const opts = distractors(correct, 3, 0, 89);
+    return {
+      icon:'➖', modeTag:'Subtração grande', label:'Resolva a continha!',
+      body: `<div class="vertical-op">
+        <div class="vrow">${a}</div>
+        <div class="vrow second"><span class="vop">−</span>${b}</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+  // sequence
+  const step = pick([1,1,2]);
+  const start = rnd(1, 80);
+  const seq = [0,1,2,3,4].map(i=>start+i*step);
+  const blankIdx = rnd(1,4);
+  const correct = seq[blankIdx];
+  const opts = distractors(correct, 3, 1, start+4*step+5);
+  const boxes = seq.map((v,i)=> i===blankIdx
+    ? `<div class="num-box blank">?</div>`
+    : `<div class="num-box filled">${v}</div>`
+  ).join('');
+  return {
+    icon:'🔢', modeTag:'Sequência', label:'Complete a sequência de números!',
+    body: `<div class="equation-row">${boxes}</div>`,
+    options: opts, correct
+  };
+}
+
+function genPhase4(){
+  const mode = pick(['word','word','word','missing','evenodd','compare']);
+  if(mode==='word'){
+    const person = pick(NAMES);
+    const name = person.name;
+    const pronoun = person.g==='f' ? 'Ela' : 'Ele';
+    const it = pick(WORD_ITEMS);
+    const quanto = it.g==='f' ? 'quantas' : 'quantos';
+    const amigo = person.g==='f' ? 'uma amiga' : 'um amigo';
+    const op = pick(['add','sub']);
+    let a,b,correct,text;
+    if(op==='add'){
+      a = rnd(3,12); b = rnd(2,9);
+      correct = a+b;
+      text = `${name} ${it.verb} ${it.item}. ${pronoun} tinha ${a} e ganhou mais ${b}. Com ${quanto} ${it.item} ${name} ficou?`;
+    } else {
+      a = rnd(8,18); b = rnd(2, a-1);
+      correct = a-b;
+      text = `${name} tinha ${a} ${it.item}. ${pronoun} deu ${b} para ${amigo}. Com ${quanto} ${it.item} ${name} ficou?`;
+    }
+    const opts = distractors(correct, 3, 0, 30);
+    return {
+      icon: it.emoji, modeTag:'Problema', label:'Leia com atenção e resolva!',
+      body: `<div class="word-text">${text}</div>`,
+      options: opts, correct
+    };
+  }
+  if(mode==='missing'){
+    const a = rnd(1,9), x = rnd(1,9);
+    const c = a+x;
+    const correct = x;
+    const opts = distractors(correct, 3, 0, 15);
+    return {
+      icon:'❓', modeTag:'Número escondido', label:'Qual número está escondido?',
+      body: `<div class="equation-row">
+        <div class="num-box filled">${a}</div><span class="op-symbol">+</span>
+        <div class="num-box blank">?</div><span class="op-symbol">=</span>
+        <div class="num-box filled">${c}</div>
+      </div>`,
+      options: opts, correct
+    };
+  }
+  if(mode==='evenodd'){
+    const wantEven = Math.random()<0.5;
+    const correct = wantEven ? rnd(1,20)*2 : rnd(1,20)*2-1;
+    const opts = [];
+    while(opts.length<3){
+      const v = rnd(2,40);
+      const isEven = v%2===0;
+      if(isEven!==wantEven && !opts.includes(v) && v!==correct) opts.push(v);
+    }
+    return {
+      icon: wantEven?'🟢':'🔵', modeTag:'Par ou ímpar', label: `Qual destes números é ${wantEven?'PAR':'ÍMPAR'}?`,
+      body: '',
+      options: shuffle([correct,...opts]), correct
+    };
+  }
+  // compare
+  let n1 = rnd(1,99), n2 = rnd(1,99);
+  while(n1===n2) n2 = rnd(1,99);
+  const correct = Math.max(n1,n2);
+  return {
+    icon:'⚖️', modeTag:'Comparando', label:'Toque no número MAIOR!',
+    body: '',
+    options: shuffle([n1,n2]), correct, twoOnly:true
+  };
+}
+
+// ============================================================
+//  GAME STATE
+// ============================================================
+let state = {
+  phase: 1,
+  qIndex: 0,
+  score: 0,
+  lives: 3,
+  streak: 0,
+  current: null,
+  locked: false,
+};
+
+function selectPhase(btn, p){
+  document.querySelectorAll('.phase-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.phase = p;
+}
+
+function startGame(){
+  state.qIndex = 0;
+  state.score = 0;
+  state.lives = 3;
+  state.streak = 0;
+  show('game');
+  loadQuestion();
+}
+
+function loadQuestion(){
+  state.locked = false;
+  const cfg = CONFIG[state.phase];
+  if(state.qIndex >= cfg.questions){ return endGame(true); }
+  state.current = generateQuestion(state.phase);
+  renderQuestion();
+  updateHud();
+}
+
+function renderQuestion(){
+  const q = state.current;
+  const cfg = CONFIG[state.phase];
+  document.getElementById('themeEmoji').textContent = q.icon;
+  const tag = document.getElementById('modeTag');
+  tag.textContent = q.modeTag;
+  tag.className = 'mode-tag ' + cfg.modeClass;
+  document.getElementById('questionLabel').textContent = q.label;
+  document.getElementById('questionBody').innerHTML = q.body;
+
+  const grid = document.getElementById('answerGrid');
+  grid.innerHTML = '';
+  grid.className = 'answer-grid' + (q.twoOnly ? ' two-col-only' : '');
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = opt;
+    btn.onclick = (e)=> selectAnswer(opt, btn, e);
+    grid.appendChild(btn);
+  });
+}
+
+function updateHud(){
+  const cfg = CONFIG[state.phase];
+  document.getElementById('scoreDisplay').textContent = state.score;
+  document.getElementById('levelDisplay').textContent = `${cfg.name.split('·')[0].trim()} · Q${state.qIndex+1}/${cfg.questions}`;
+  document.getElementById('livesDisplay').textContent = '❤️'.repeat(state.lives) + '🖤'.repeat(3-state.lives);
+  document.getElementById('progressFill').style.width = `${(state.qIndex/cfg.questions)*100}%`;
+}
+
+function selectAnswer(val, btnEl, evt){
+  if(state.locked) return;
+  state.locked = true;
+  const correct = state.current.correct;
+  const allBtns = document.querySelectorAll('.answer-btn');
+
+  if(val === correct){
+    state.streak++;
+    const bonus = Math.min(state.streak-1, 5)*2;
+    state.score += 10 + bonus;
+    btnEl.classList.add('correct-choice');
+    allBtns.forEach(b=>{ if(b!==btnEl) b.classList.add('disabled'); });
+    spawnParticles(btnEl, ['✨','⭐','🎉','💫']);
+    if(state.streak>=3) showStreakToast(state.streak);
+    updateHud();
+    setTimeout(()=> showFeedback(true), 500);
+  } else {
+    state.streak = 0;
+    state.lives--;
+    btnEl.classList.add('wrong-choice');
+    allBtns.forEach(b=>{
+      if(b.textContent == correct) b.classList.add('correct-choice');
+      else if(b!==btnEl) b.classList.add('disabled');
+    });
+    document.getElementById('questionCard').classList.add('shake');
+    updateHud();
+    setTimeout(()=>{
+      document.getElementById('questionCard').classList.remove('shake');
+      showFeedback(false);
+    }, 600);
+  }
+}
+
+function showFeedback(win){
+  const emoji = document.getElementById('feedbackEmoji');
+  const title = document.getElementById('feedbackTitle');
+  const sub = document.getElementById('feedbackSub');
+  if(win){
+    emoji.textContent = pick(['🎉','🌟','😄','👏','🥳']);
+    title.textContent = pick(['Acertou!','Show de bola!','Muito bem!','Isso aí!']);
+    title.className = 'feedback-title win';
+    sub.textContent = state.streak>=3 ? `Sequência de ${state.streak} acertos! 🔥` : '+' + (10+Math.min(state.streak-1,5)*2) + ' pontos';
+  } else {
+    emoji.textContent = pick(['💭','🤔','😅']);
+    title.textContent = 'Quase lá!';
+    title.className = 'feedback-title lose';
+    sub.textContent = `A resposta certa era ${state.current.correct}`;
+  }
+  if(state.lives<=0){
+    show('feedback');
+    setTimeout(()=> endGame(false), 100);
+    document.querySelector('.feedback-btn').onclick = ()=> endGame(false);
+  } else {
+    document.querySelector('.feedback-btn').onclick = nextQuestion;
+    show('feedback');
+  }
+}
+
+function nextQuestion(){
+  state.qIndex++;
+  show('game');
+  loadQuestion();
+}
+
+function endGame(completed){
+  const cfg = CONFIG[state.phase];
+  const pct = state.qIndex / cfg.questions;
+  let stars = 1;
+  if(state.lives===3 && completed) stars = 3;
+  else if(state.lives>=2) stars = 2;
+
+  document.getElementById('resultEmoji').textContent = completed ? (stars===3?'🏆':'🎉') : '💪';
+  document.getElementById('resultTitle').textContent = completed ? 'Parabéns!' : 'Continue treinando!';
+  document.getElementById('resultScore').textContent = `Você fez ${state.score} pontos!`;
+  document.getElementById('resultStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+
+  const best = Math.max(state.score, getBest());
+  setBest(best);
+  document.querySelector('#bestScoreDisplay span').textContent = best;
+
+  show('result');
+  if(completed) launchConfetti();
+}
+
+function goHome(){ show('home'); }
+
+function confirmExit(){ document.getElementById('exitConfirm').classList.add('visible'); }
+function closeExit(){ document.getElementById('exitConfirm').classList.remove('visible'); }
+function doExit(){ closeExit(); show('home'); }
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ============================================================
+//  FX
+// ============================================================
+function spawnParticles(el, emojis){
+  const rect = el.getBoundingClientRect();
+  for(let i=0;i<5;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = pick(emojis);
+    p.style.left = (rect.left + rect.width/2 + rnd(-20,20)) + 'px';
+    p.style.top = (rect.top + rect.height/2) + 'px';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 1300);
+  }
+}
+
+function launchConfetti(){
+  const colors = ['#FF6B6B','#FFE66D','#4ECDC4','#A855F7','#60A5FA','#4ADE80','#FB923C','#F472B6'];
+  for(let i=0;i<60;i++){
+    setTimeout(()=>{
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = rnd(0,100) + 'vw';
+      c.style.background = pick(colors);
+      c.style.borderRadius = Math.random()<0.5 ? '50%' : '2px';
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 2000);
+    }, i*30);
+  }
+}
+
+let streakTimer;
+function showStreakToast(n){
+  const el = document.getElementById('streakToast');
+  el.textContent = `🔥 Sequência de ${n}!`;
+  el.classList.add('show');
+  clearTimeout(streakTimer);
+  streakTimer = setTimeout(()=>el.classList.remove('show'), 1400);
+}
+
+function getBest(){ return parseInt(localStorage.getItem('continhasBestScore')||'0',10); }
+function setBest(v){ localStorage.setItem('continhasBestScore', v); }
+
+// ============================================================
+//  INIT
+// ============================================================
+function buildStars(){
+  const field = document.getElementById('starField');
+  for(let i=0;i<40;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = rnd(0,100) + 'vw';
+    s.style.top = rnd(0,100) + 'vh';
+    s.style.animationDelay = (Math.random()*3).toFixed(2) + 's';
+    field.appendChild(s);
+  }
+}
+buildStars();
+document.querySelector('#bestScoreDisplay span').textContent = getBest();
+</script>
+</body>
+</html>
