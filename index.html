@@ -420,7 +420,7 @@
   .bars .col span { color: #fff; font-weight: 900; font-size: 15px; padding-top: 2px; }
   .bars .lab { font-size: 28px; padding-top: 4px; }
   .trace-wrap { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  #traceCv { width: min(100%, 52vh, 340px); aspect-ratio: 1; background: rgba(255,255,255,.95); border-radius: 22px; border: 4px solid rgba(255,255,255,.4); touch-action: none; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+  #traceCv { width: min(100%, 52vh, 340px); aspect-ratio: 1; background: linear-gradient(160deg,#1e2a66,#2d2373); border-radius: 22px; border: 4px solid rgba(255,255,255,.45); touch-action: none; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
   #traceCv.ok { border-color: var(--green); box-shadow: 0 0 28px rgba(74,222,128,.7); }
   #traceCv.bad { animation: shake .4s; border-color: var(--coral); }
   .trace-hint { color: rgba(255,255,255,.85); font-weight: 700; font-size: 15px; text-align: center; min-height: 20px; }
@@ -469,6 +469,20 @@
   .sk em { font-style: normal; text-align: right; }
   .pn-opt { display: flex; gap: 8px; align-items: center; font-size: 14px; margin: 8px 0; }
   .pn-acts { display: flex; gap: 8px; } .pn-acts .ov-btn { font-size: 13px; padding: 9px; }
+
+  .phase-btn .sh { font-size: 11px; opacity: .8; font-family: 'Nunito', sans-serif; font-weight: 700; }
+  .obj-rows { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 8px 0; }
+  .obj-line { display: flex; gap: 6px; justify-content: center; }
+  .cmp-row { display: flex; gap: 12px; justify-content: center; margin: 8px 0; }
+  .cmp-box { flex: 1; max-width: 190px; min-height: 90px; border-radius: 16px; padding: 8px 4px; display: flex; align-items: center; justify-content: center; border: 4px solid; }
+  .cmp-box .obj-emoji { font-size: clamp(22px, 6vw, 32px); }
+  .cmp-box.blue { border-color: #60A5FA; background: rgba(96,165,250,.14); }
+  .cmp-box.orange { border-color: #FB923C; background: rgba(251,146,60,.14); }
+
+  .obj-rows { gap: 4px; }
+  .cmp-box { flex: 1 1 0; min-width: 0; }
+  .cmp-box .obj-emoji { font-size: clamp(20px, 5.4vw, 28px); }
+  .cmp-box .obj-line { gap: 2px; }
 </style>
 </head>
 <body>
@@ -551,19 +565,19 @@
 //  dinheiro (Real), horas, calendário, gráficos simples e formas.
 // ============================================================
 const CONFIG = {
-  0: { name:'Nível 0 · Escrever números', questions: 6,  icon:'✏️', modeClass:'mode-0' },
-  1: { name:'Nível 1 · Contando',          questions: 8,  icon:'🍎', modeClass:'mode-1' },
-  2: { name:'Nível 2 · Continhas',         questions: 10, icon:'🔢', modeClass:'mode-2' },
-  3: { name:'Nível 3 · Desafio',           questions: 10, icon:'🧠', modeClass:'mode-3' },
-  4: { name:'Nível 4 · Problemas',         questions: 10, icon:'📖', modeClass:'mode-4' },
-  5: { name:'Nível 5 · Números e formas',  questions: 10, icon:'🌍', modeClass:'mode-5' },
-  6: { name:'Nível 6 · Mundo real',        questions: 10, icon:'🕒', modeClass:'mode-6' },
+  0: { name:'Nível 0 · Escrever números', short:'Escrever',    questions: 6,  icon:'✏️', modeClass:'mode-0' },
+  1: { name:'Nível 1 · Contar e comparar',  short:'Contar',      questions: 8,  icon:'🍎', modeClass:'mode-1' },
+  2: { name:'Nível 2 · Somar e subtrair',   short:'Continhas',   questions: 10, icon:'🔢', modeClass:'mode-2' },
+  3: { name:'Nível 3 · Contas maiores',     short:'Dezenas',     questions: 10, icon:'🧠', modeClass:'mode-3' },
+  4: { name:'Nível 4 · Probleminhas',       short:'Problemas',   questions: 10, icon:'📖', modeClass:'mode-4' },
+  5: { name:'Nível 5 · Números e formas',   short:'Números',     questions: 10, icon:'🌍', modeClass:'mode-5' },
+  6: { name:'Nível 6 · Mundo real',         short:'Mundo real',  questions: 10, icon:'🕒', modeClass:'mode-6' },
 };
 const LEVELS = [0,1,2,3,4,5,6];
 const LEVEL_ICON = LEVELS.map(n => CONFIG[n].icon);
 
 const SKILL_LABEL = {
-  escrever:'Escrever números', contar:'Contar', somarVis:'Somar com figuras', subVis:'Subtrair com figuras', maisMenos:'Mais ou menos',
+  escrever:'Escrever números', contar:'Contar', somarVis:'Somar com figuras', contarMix:'Contar só um tipo', maisMenos:'Mais ou menos', somaDez:'Dezena mais unidade',
   somar:'Somar', subtrair:'Subtrair', falta:'Número escondido', dez:'Completar 10',
   tripla:'Somar três números', somaGrande:'Somar com dezenas', subGrande:'Subtrair com dezenas', sequencia:'Sequências',
   pJuntar:'Problema: juntar', pGanhar:'Problema: ganhar', pTirar:'Problema: tirar', pSobrar:'Problema: sobrar', pComparar:'Problema: quantos a mais',
@@ -654,8 +668,8 @@ function clockSVG(h){
   let nums='';for(let i=1;i<=12;i++){const a=i*30*Math.PI/180;nums+=`<text x="${50+31*Math.sin(a)}" y="${50-31*Math.cos(a)+3.6}" text-anchor="middle" font-size="10" font-weight="900" fill="#14162B" font-family="Nunito,Arial">${i}</text>`;}
   const ha=(h%12)*30*Math.PI/180;
   return `<svg class="clock" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="#fff" stroke="#4ECDC4" stroke-width="5"/>${ticks}${nums}
-   <line x1="50" y1="50" x2="${50+22*Math.sin(ha)}" y2="${50-22*Math.cos(ha)}" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round"/>
-   <line x1="50" y1="50" x2="50" y2="${50-34}" stroke="#14162B" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3.6" fill="#14162B"/></svg>`;
+   <line x1="50" y1="50" x2="${50+18*Math.sin(ha)}" y2="${50-18*Math.cos(ha)}" stroke="#FF6B6B" stroke-width="5" stroke-linecap="round"/>
+   <line x1="50" y1="50" x2="50" y2="${50-26}" stroke="#14162B" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3.6" fill="#14162B"/></svg>`;
 }
 const MONEY = { 1:['R$ 1','#d9a441'], 2:['R$ 2','#7c8cf8'], 5:['R$ 5','#a855f7'], 10:['R$ 10','#f87171'], 20:['R$ 20','#fb923c'] };
 function moneyChip(v){ const [t,c]=MONEY[v]; const note = v>=2; return `<span class="money ${note?'note':'coin'}" style="--mc:${c}">${t}</span>`; }
@@ -664,152 +678,199 @@ function barChart(items){ // items: [{e,n}]
   return `<div class="bars">${items.map(i=>`<div class="bar"><div class="col" style="height:${Math.round(i.n/mx*100)}%"><span>${i.n}</span></div><div class="lab">${i.e}</div></div>`).join('')}</div>`;
 }
 
-
 // ============================================================
-//  GERADORES DE PERGUNTAS (cada um devolve uma pergunta com "skill")
+//  GERADORES DE PERGUNTAS
+//  Cada gerador recebe t (0 = comecinho do jogo, 1 = meio, 2 = final) e escala a dificuldade.
 // ============================================================
-const Q = {};   // por habilidade
+const Q = {};
 const DAYS = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
 const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const by = (t, a, b, c) => { const r = [a, b, c][t] || c; return rnd(r[0], r[1]); };
 
-// ---- Nível 1 ----
-Q.contar = () => { const e=pick(OBJ_POOL), n=rnd(2,10);
-  return { skill:'contar', icon:e, modeTag:'Contando', label:'Quantos há? Conte com carinho!', body:`<div class="objects-row">${group(n,e)}</div>`, options:distractors(n,3,1,12), correct:n, explain:`Há ${n}.` }; };
-Q.somarVis = () => { const e=pick(OBJ_POOL), a=rnd(1,6), b=rnd(1,5), c=a+b;
-  return { skill:'somarVis', icon:e, modeTag:'Somando', label:'Quantos há ao todo?', body:`<div class="objects-row">${group(a,e)}${sym('+')}${group(b,e)}${sym('=')}<div class="eq-box">?</div></div>`, options:distractors(c,3,1,12), correct:c, explain:`${a} + ${b} = ${c}` }; };
-Q.subVis = () => { const e=pick(OBJ_POOL), a=rnd(4,10), b=rnd(1,a-1), c=a-b;
-  return { skill:'subVis', icon:e, modeTag:'Tirando', label:`Havia ${a}. Os riscados saíram. Quantos sobraram?`, body:`<div class="objects-row">${group(a,e,b)}</div>`, options:distractors(c,3,0,10), correct:c, explain:`${a} − ${b} = ${c}` }; };
-Q.maisMenos = () => { const e=pick(OBJ_POOL), a=rnd(2,9); let b=rnd(2,9); while(b===a) b=rnd(2,9);
-  const more = Math.random()<.6, corr = (more ? a>b : a<b) ? 'esq' : 'dir';
-  return { skill:'maisMenos', icon:'⚖️', modeTag:'Mais ou menos', label:`Qual grupo tem ${more?'MAIS':'MENOS'}?`, body:`<div class="objects-row">${group(a,e)}${sym('×')}${group(b,e)}</div>`,
-    options:['esq','dir'], correct:corr, twoOnly:true, fmt:v=>v==='esq'?'👈 Esquerdo':'Direito 👉', explain:`Esquerdo ${a}, direito ${b}.` }; };
+// objetos com nome no plural e gênero (para "Quantos/Quantas")
+const OBJ = [
+  {e:'🍎',n:'maçãs',g:'f'},{e:'🍌',n:'bananas',g:'f'},{e:'🍇',n:'cachos de uva',g:'m'},{e:'🍓',n:'morangos',g:'m'},{e:'🍊',n:'laranjas',g:'f'},
+  {e:'⭐',n:'estrelas',g:'f'},{e:'🎈',n:'balões',g:'m'},{e:'🚗',n:'carrinhos',g:'m'},{e:'⚽',n:'bolas',g:'f'},{e:'🐱',n:'gatinhos',g:'m'},
+  {e:'🐶',n:'cachorrinhos',g:'m'},{e:'🦆',n:'patinhos',g:'m'},{e:'🐸',n:'sapinhos',g:'m'},{e:'🌸',n:'flores',g:'f'},{e:'🧸',n:'ursinhos',g:'m'},
+  {e:'🍪',n:'biscoitos',g:'m'},{e:'🎁',n:'presentes',g:'m'},{e:'🐝',n:'abelhas',g:'f'},{e:'🦋',n:'borboletas',g:'f'},{e:'🐟',n:'peixinhos',g:'m'},
+  {e:'🍭',n:'pirulitos',g:'m'},{e:'🍉',n:'melancias',g:'f'},{e:'🐢',n:'tartarugas',g:'f'},{e:'🪁',n:'pipas',g:'f'}
+];
+const pickObj = (not) => { let o; do { o = pick(OBJ); } while (not && o.e === not.e); return o; };
+const Quant = (o) => o.g === 'f' ? 'Quantas' : 'Quantos';
+// objetos em fileiras de 5 (ajuda a contar sem se perder)
+const rows5 = (items) => { const out = []; for (let i = 0; i < items.length; i += 5) out.push(`<div class="obj-line">${items.slice(i, i + 5).map(e => `<span class="obj-emoji">${e}</span>`).join('')}</div>`); return `<div class="obj-rows">${out.join('')}</div>`; };
+const manyOf = (n, e) => rows5(Array(n).fill(e));
 
-// ---- Nível 2 ----
-Q.somar = () => { const a=rnd(1,9), b=rnd(1,9), c=a+b;
-  return { skill:'somar', icon:'➕', modeTag:'Somando', label:'Resolva a continha!', body:vert(a,'+',b), options:distractors(c,3,0,18), correct:c, explain:`${a} + ${b} = ${c}` }; };
-Q.subtrair = () => { const m=rnd(5,18), s=rnd(1,Math.min(9,m-1)), c=m-s;
-  return { skill:'subtrair', icon:'➖', modeTag:'Subtraindo', label:'Resolva a continha!', body:vert(m,'−',s), options:distractors(c,3,0,18), correct:c, explain:`${m} − ${s} = ${c}` }; };
-Q.falta = () => { const a=rnd(1,9), x=rnd(1,9), c=a+x;
-  return { skill:'falta', icon:'❓', modeTag:'Número escondido', label:'Qual número está escondido?', body:eqRow(nb(a)+sym('+')+nb('?',1)+sym('=')+nb(c)), options:distractors(x,3,0,15), correct:x, explain:`${a} + ${x} = ${c}` }; };
-Q.dez = () => { const a=rnd(1,9), x=10-a;
-  return { skill:'dez', icon:'🔟', modeTag:'Completar 10', label:'Quanto falta para chegar a 10?', body:eqRow(nb(a)+sym('+')+nb('?',1)+sym('=')+nb(10)), options:distractors(x,3,0,10), correct:x, explain:`${a} + ${x} = 10` }; };
+// ---------- Nível 1: contar e comparar ----------
+Q.contar = (t) => { const o = pickObj(), n = by(t, [1,5], [4,9], [8,14]);
+  return { skill:'contar', sig:'c'+n, icon:o.e, modeTag:'Contando', label:`${Quant(o)} ${o.n} você vê?`, body:manyOf(n, o.e), options:distractors(n,3,Math.max(0,n-5),n+5), correct:n, explain:`Contando um por um, são ${n}.` }; };
+Q.contarMix = (t) => { const o1 = pickObj(), o2 = pickObj(o1); let a = by(t, [2,5], [3,7], [4,9]), b = by(t, [2,5], [3,7], [4,9]); while (b === a) b = by(t, [2,5], [3,7], [4,9]);
+  const askFirst = Math.random() < .5, tgt = askFirst ? o1 : o2, n = askFirst ? a : b;
+  const items = shuffle([...Array(a).fill(o1.e), ...Array(b).fill(o2.e)]);
+  return { skill:'contarMix', sig:'m'+a+'-'+b+(askFirst?'a':'b'), icon:tgt.e, modeTag:'Contando', label:`${Quant(tgt)} ${tgt.n} ${tgt.e} você vê?`, say:`${Quant(tgt)} ${tgt.n} você vê?`, body:rows5(items), options:distractors(n,3,Math.max(0,n-4),n+4), correct:n, explain:`Contando só ${tgt.n}, são ${n}.` }; };
+Q.maisMenos = (t) => { const o = pickObj(); let a = by(t, [1,5], [2,8], [4,10]), b = by(t, [1,5], [2,8], [4,10]); const minDiff = t === 0 ? 2 : 1; let g = 0;
+  while ((Math.abs(a - b) < minDiff) && g++ < 50) b = by(t, [1,5], [2,8], [4,10]);
+  if (a === b) b = a + 2;
+  const more = Math.random() < .5, left = a, right = b, corr = (more ? left > right : left < right) ? 'azul' : 'laranja';
+  const box = (n, cls) => `<div class="cmp-box ${cls}">${manyOf(n, o.e)}</div>`;
+  return { skill:'maisMenos', sig:'mm'+a+'-'+b, icon:'⚖️', modeTag:'Mais ou menos', label:`Em qual quadrado tem ${more ? 'MAIS' : 'MENOS'} ${o.n}?`, say:`Em qual quadrado tem ${more ? 'mais' : 'menos'} ${o.n}? O azul ou o laranja?`,
+    body:`<div class="cmp-row">${box(left,'blue')}${box(right,'orange')}</div>`, options:['azul','laranja'], correct:corr, twoOnly:true, fmt:v => v === 'azul' ? '🟦 Azul' : '🟧 Laranja', explain:`No azul há ${left} e no laranja há ${right}.` }; };
 
-// ---- Nível 3 ----
-Q.tripla = () => { const a=rnd(1,6), b=rnd(1,6), c=rnd(1,6), t=a+b+c;
-  return { skill:'tripla', icon:'🧮', modeTag:'Soma tripla', label:'Some os três números!', body:eqRow(nb(a)+sym('+')+nb(b)+sym('+')+nb(c)+sym('=')+nb('?',1)), options:distractors(t,3,0,22), correct:t, explain:`${a} + ${b} + ${c} = ${t}` }; };
-Q.somaGrande = () => { let a,b; do{ a=rnd(10,39); b=rnd(2,30); } while((a%10)+(b%10)>=10);
-  const c=a+b; return { skill:'somaGrande', icon:'➕', modeTag:'Soma grande', label:'Resolva a continha!', body:vert(a,'+',b), options:distractors(c,3,10,99), correct:c, explain:`${a} + ${b} = ${c}` }; };
-Q.subGrande = () => { let a,b; do{ a=rnd(21,69); b=rnd(2,a-10); } while((a%10)<(b%10));
-  const c=a-b; return { skill:'subGrande', icon:'➖', modeTag:'Subtração grande', label:'Resolva a continha!', body:vert(a,'−',b), options:distractors(c,3,0,89), correct:c, explain:`${a} − ${b} = ${c}` }; };
-Q.sequencia = () => { const step=pick([1,1,2]), start=rnd(1,60), seq=[0,1,2,3,4].map(i=>start+i*step), bi=rnd(1,4), c=seq[bi];
-  return { skill:'sequencia', icon:'🔢', modeTag:'Sequência', label:'Complete a sequência de números!', body:eqRow(seq.map((v,i)=>nb(i===bi?'?':v,i===bi)).join('')), options:distractors(c,3,1,start+4*step+5), correct:c, explain:`A sequência anda de ${step} em ${step}.` }; };
+// ---------- Nível 2: somar e subtrair ----------
+Q.somarVis = (t) => { const o = pickObj(); const a = by(t, [1,4], [2,6], [3,7]), b = by(t, [1,4], [1,5], [2,6]), c = a + b;
+  return { skill:'somarVis', sig:'sv'+a+'+'+b, icon:o.e, modeTag:'Somando', label:`${Quant(o)} ${o.n} há ao todo?`, say:`${Quant(o)} ${o.n} há ao todo?`, body:`<div class="objects-row">${group(a,o.e)}${sym('+')}${group(b,o.e)}${sym('=')}<div class="eq-box">?</div></div>`, options:distractors(c,3,0,c+5), correct:c, explain:`${a} + ${b} = ${c}` }; };
+Q.somar = (t) => { let a, b; const lim = [6, 10, 18][t];
+  do { a = rnd(1, t === 2 ? 9 : t === 1 ? 8 : 5); b = rnd(1, t === 2 ? 9 : t === 1 ? 8 : 4); } while (a + b > lim);
+  const c = a + b, horiz = Math.random() < .5;
+  return { skill:'somar', sig:'s'+a+'+'+b, icon:'➕', modeTag:'Somando', label:'Resolva a continha!', say:`Quanto é ${a} mais ${b}?`, body: horiz ? eqRow(nb(a)+sym('+')+nb(b)+sym('=')+nb('?',1)) : vert(a,'+',b), options:distractors(c,3,0,c+5), correct:c, explain:`${a} + ${b} = ${c}` }; };
+Q.subtrair = (t) => { const mx = [6, 10, 18][t], m = rnd(t === 0 ? 3 : t === 1 ? 5 : 10, mx), s = rnd(1, Math.min(t === 2 ? 9 : m - 1, m - 1)), c = m - s, horiz = Math.random() < .5;
+  return { skill:'subtrair', sig:'r'+m+'-'+s, icon:'🔻', modeTag:'Subtraindo', label:'Resolva a continha!', say:`Quanto é ${m} menos ${s}?`, body: horiz ? eqRow(nb(m)+sym('−')+nb(s)+sym('=')+nb('?',1)) : vert(m,'−',s), options:distractors(c,3,0,m), correct:c, explain:`${m} − ${s} = ${c}` }; };
+Q.falta = (t) => { const mx = [8, 10, 18][t]; let a, x; do { a = rnd(1, 9); x = rnd(1, 9); } while (a + x > mx); const c = a + x, left = Math.random() < .5;
+  return { skill:'falta', sig:'f'+a+'+'+x, icon:'❓', modeTag:'Número escondido', label:'Qual número está escondido?', say:'Qual número está escondido?', body: eqRow(left ? nb(a)+sym('+')+nb('?',1)+sym('=')+nb(c) : nb('?',1)+sym('+')+nb(a)+sym('=')+nb(c)), options:distractors(x,3,0,c+3), correct:x, explain:`${a} + ${x} = ${c}` }; };
+Q.dez = () => { const a = rnd(1,9), x = 10 - a;
+  return { skill:'dez', sig:'d'+a, icon:'🔟', modeTag:'Completar 10', label:'Quanto falta para chegar a 10?', body:eqRow(nb(a)+sym('+')+nb('?',1)+sym('=')+nb(10)), options:distractors(x,3,0,10), correct:x, explain:`${a} + ${x} = 10` }; };
 
-// ---- Nível 4: problemas do 1º ano ----
+// ---------- Nível 3: contas maiores ----------
+Q.somaDez = (t) => { const d = by(t, [1,3], [1,5], [2,8]) * 10, u = rnd(1, 9), c = d + u;
+  return { skill:'somaDez', sig:'sd'+d+'+'+u, icon:'🔟', modeTag:'Dezena + unidade', label:'Resolva a continha!', say:`Quanto é ${d} mais ${u}?`, body:eqRow(nb(d)+sym('+')+nb(u)+sym('=')+nb('?',1)), options:distractors(c,3,d-5,d+12), correct:c, explain:`${d} + ${u} = ${c}` }; };
+Q.tripla = (t) => { const mx = [4, 6, 9][t], a = rnd(1,mx), b = rnd(1,mx), c = rnd(1,mx), s = a + b + c;
+  return { skill:'tripla', sig:'t'+a+b+c, icon:'🧮', modeTag:'Soma de três', label:'Some os três números!', say:`Quanto é ${a} mais ${b} mais ${c}?`, body:eqRow(nb(a)+sym('+')+nb(b)+sym('+')+nb(c)+sym('=')+nb('?',1)), options:distractors(s,3,0,s+6), correct:s, explain:`${a} + ${b} = ${a+b} e ${a+b} + ${c} = ${s}` }; };
+Q.somaGrande = (t) => { let a, b; do { a = rnd(10, [29, 49, 69][t]); b = rnd(2, [15, 30, 40][t]); } while ((a % 10) + (b % 10) >= 10);
+  const c = a + b; return { skill:'somaGrande', sig:'sg'+a+'+'+b, icon:'➕', modeTag:'Soma com dezenas', label:'Resolva a continha!', say:`Quanto é ${a} mais ${b}?`, body:vert(a,'+',b), options:distractors(c,3,10,c+12), correct:c, explain:`${a} + ${b} = ${c}` }; };
+Q.subGrande = (t) => { let a, b; do { a = rnd(21, [39, 59, 79][t]); b = rnd(2, a - 10); } while ((a % 10) < (b % 10) || b > [20, 30, 45][t]);
+  const c = a - b; return { skill:'subGrande', sig:'sb'+a+'-'+b, icon:'🔻', modeTag:'Subtração com dezenas', label:'Resolva a continha!', say:`Quanto é ${a} menos ${b}?`, body:vert(a,'−',b), options:distractors(c,3,0,a), correct:c, explain:`${a} − ${b} = ${c}` }; };
+Q.sequencia = (t) => { const step = t === 0 ? 1 : pick([1,2,2]), down = t === 2 && Math.random() < .5, start = down ? rnd(20, 60) : rnd(1, [30, 50, 60][t]),
+    seq = [0,1,2,3,4].map(i => down ? start - i*step : start + i*step), bi = rnd(1,4), c = seq[bi];
+  return { skill:'sequencia', sig:'q'+seq.join(','), icon:'🔢', modeTag:'Sequência', label:'Complete a sequência de números!', body:eqRow(seq.map((v,i)=>nb(i===bi?'?':v,i===bi)).join('')), options:distractors(c,3,Math.max(0,Math.min(...seq)-3),Math.max(...seq)+3), correct:c, explain:`A sequência ${down?'desce':'sobe'} de ${step} em ${step}.` }; };
+
+// ---------- Nível 4: probleminhas do 1º ano ----------
 function person(){ return pick(NAMES); }
-function twoPeople(){ const a=person(); let b=person(); while(b.name===a.name) b=person(); return [a,b]; }
-const ela = p => p.g==='f' ? 'Ela' : 'Ele';
-const quantos = it => it.g==='f' ? 'quantas' : 'quantos';
-function prob(skill, icon, tag, text, correct, explain, min=0, max=30, extraBody=''){
-  return { skill, icon, modeTag:tag, label:'Leia com atenção e resolva!', body:`${extraBody}<div class="word-text">${text}</div>`, say:text, options:distractors(correct,3,min,max), correct, explain };
+function twoPeople(){ const a = person(); let b = person(); while (b.name === a.name) b = person(); return [a, b]; }
+const ela = p => p.g === 'f' ? 'Ela' : 'Ele';
+const quantos = it => it.g === 'f' ? 'quantas' : 'quantos';
+const Cap = s => s[0].toUpperCase() + s.slice(1);
+function prob(skill, sig, icon, tag, text, correct, explain, min=0, max=30, extraBody=''){
+  return { skill, sig, icon, modeTag:tag, label:'Leia com atenção e resolva!', body:`${extraBody}<div class="word-text">${text}</div>`, say:text, options:distractors(correct,3,min,max), correct, explain };
 }
-Q.pJuntar = () => { const [p1,p2]=twoPeople(), it=pick(WORD_ITEMS), a=rnd(2,9), b=rnd(2,9), c=a+b;
-  return prob('pJuntar', it.emoji, 'Problema', `${p1.name} tem ${a} ${it.item}. ${p2.name} tem ${b}. ${quantos(it)[0].toUpperCase()+quantos(it).slice(1)} ${it.item} eles têm juntos?`, c, `${a} + ${b} = ${c}`); };
-Q.pGanhar = () => { const p=person(), it=pick(WORD_ITEMS), a=rnd(3,12), b=rnd(2,8), c=a+b;
-  return prob('pGanhar', it.emoji, 'Problema', `${p.name} tinha ${a} ${it.item} e ganhou mais ${b}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`, c, `${a} + ${b} = ${c}`); };
-Q.pTirar = () => { const p=person(), q=person(), it=pick(WORD_ITEMS), a=rnd(8,18), b=rnd(2,a-2), c=a-b;
-  return prob('pTirar', it.emoji, 'Problema', `${p.name} tinha ${a} ${it.item}. ${ela(p)} deu ${b} para ${q.name}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`, c, `${a} − ${b} = ${c}`); };
-Q.pSobrar = () => { const p=person(), it=pick([{item:'maçãs',emoji:'🍎',g:'f'},{item:'bananas',emoji:'🍌',g:'f'},{item:'biscoitos',emoji:'🍪',g:'m'},{item:'pirulitos',emoji:'🍭',g:'m'}]), a=rnd(6,15), b=rnd(1,a-1), c=a-b;
-  return prob('pSobrar', it.emoji, 'Problema', `Havia ${a} ${it.item} na mesa. ${p.name} comeu ${b}. ${quantos(it)[0].toUpperCase()+quantos(it).slice(1)} sobraram?`, c, `${a} − ${b} = ${c}`); };
-Q.pComparar = () => { const [p1,p2]=twoPeople(), it=pick(WORD_ITEMS), b=rnd(2,9), d=rnd(1,8), a=b+d;
-  return prob('pComparar', it.emoji, 'Problema', `${p1.name} tem ${a} ${it.item} e ${p2.name} tem ${b}. ${p1.name} tem ${quantos(it)} ${it.item} a mais que ${p2.name}?`, d, `${a} − ${b} = ${d}`, 0, 15); };
-Q.pCompletar = () => { const p=person(), it=pick(WORD_ITEMS), t=rnd(8,16), a=rnd(2,t-2), c=t-a;
-  return prob('pCompletar', it.emoji, 'Problema', `${p.name} quer juntar ${t} ${it.item}. Já tem ${a}. ${quantos(it)[0].toUpperCase()+quantos(it).slice(1)} ainda faltam?`, c, `${a} + ${c} = ${t}`, 0, 18); };
-Q.pDuas = () => { const p=person(), it=pick(WORD_ITEMS); let a,b,c,r; do{ a=rnd(4,10); b=rnd(2,7); c=rnd(2,9); r=a+b-c; } while(r<1);
-  return prob('pDuas', it.emoji, 'Problema', `${p.name} tinha ${a} ${it.item}, ganhou ${b} e depois deu ${c}. Com ${quantos(it)} ficou?`, r, `${a} + ${b} = ${a+b} e ${a+b} − ${c} = ${r}`, 0, 20); };
-Q.pDobro = () => { const [p1,p2]=twoPeople(), it=pick(WORD_ITEMS), a=rnd(2,9), c=a*2;
-  return prob('pDobro', it.emoji, 'Problema', `${p1.name} tem ${a} ${it.item}. ${p2.name} tem o dobro. ${quantos(it)[0].toUpperCase()+quantos(it).slice(1)} ${it.item} ${p2.name} tem?`, c, `O dobro de ${a} é ${a} + ${a} = ${c}`, 0, 24); };
-Q.pMetade = () => { const p=person(), it=pick(WORD_ITEMS), h=rnd(2,8), t=h*2;
-  return prob('pMetade', it.emoji, 'Problema', `${p.name} tem ${t} ${it.item} e quer repartir igualmente com 1 amigo. Cada um fica com ${quantos(it)}?`, h, `${h} + ${h} = ${t}`, 0, 16); };
-Q.pGrupos = () => { const k=pick([2,3,5]), n=rnd(2, k===5?4:5), c=k*n, em=pick(['🍪','🍎','⭐','🍬']);
+Q.pJuntar = (t) => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), a = by(t,[1,5],[2,8],[3,10]), b = by(t,[1,4],[2,7],[3,9]), c = a + b;
+  const txt = pick([
+    `${p1.name} tem ${a} ${it.item}. ${p2.name} tem ${b}. ${Cap(quantos(it))} ${it.item} eles têm juntos?`,
+    `${p1.name} guardou ${a} ${it.item} e ${p2.name} guardou ${b}. ${Cap(quantos(it))} ${it.item} eles guardaram ao todo?`,
+    `Na caixa de ${p1.name} tem ${a} ${it.item}. Na caixa de ${p2.name} tem ${b}. ${Cap(quantos(it))} ${it.item} há nas duas caixas?`]);
+  return prob('pJuntar', 'pj'+a+'+'+b, it.emoji, 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
+Q.pGanhar = (t) => { const p = person(), it = pick(WORD_ITEMS), a = by(t,[2,6],[3,9],[5,12]), b = by(t,[1,4],[2,6],[3,8]), c = a + b;
+  const txt = pick([
+    `${p.name} tinha ${a} ${it.item} e ganhou mais ${b}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
+    `${p.name} tem ${a} ${it.item}. Ganhou ${b} de presente. ${Cap(quantos(it))} ${it.item} ${p.name} tem agora?`]);
+  return prob('pGanhar', 'pg'+a+'+'+b, it.emoji, 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
+Q.pTirar = (t) => { const [p,q] = twoPeople(), it = pick(WORD_ITEMS), a = by(t,[4,8],[6,12],[9,18]), b = rnd(1, Math.min(a - 1, t === 0 ? 4 : 8)), c = a - b;
+  const txt = pick([
+    `${p.name} tinha ${a} ${it.item}. ${ela(p)} deu ${b} para ${q.name}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
+    `${p.name} tinha ${a} ${it.item} e perdeu ${b}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
+    `${p.name} tinha ${a} ${it.item}. ${ela(p)} emprestou ${b} para ${q.name}. ${Cap(quantos(it))} ${it.item} ficaram com ${p.name}?`]);
+  return prob('pTirar', 'pt'+a+'-'+b, it.emoji, 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
+Q.pSobrar = (t) => { const p = person(), it = pick([{item:'maçãs',emoji:'🍎',g:'f'},{item:'bananas',emoji:'🍌',g:'f'},{item:'biscoitos',emoji:'🍪',g:'m'},{item:'pirulitos',emoji:'🍭',g:'m'},{item:'uvas',emoji:'🍇',g:'f'}]),
+    a = by(t,[5,9],[7,13],[10,18]), b = rnd(1, Math.min(a - 1, t === 0 ? 4 : 8)), c = a - b;
+  const txt = pick([
+    `Em cima da mesa estavam ${a} ${it.item}. ${p.name} comeu ${b}. ${Cap(quantos(it))} sobraram?`,
+    `A mamãe colocou ${a} ${it.item} na fruteira. ${p.name} pegou ${b}. ${Cap(quantos(it))} ${it.item} ficaram na fruteira?`]);
+  return prob('pSobrar', 'ps'+a+'-'+b, it.emoji, 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
+Q.pComparar = (t) => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), b = by(t,[2,6],[3,9],[4,11]), d = by(t,[1,3],[1,5],[2,7]), a = b + d;
+  const txt = pick([
+    `${p1.name} tem ${a} ${it.item} e ${p2.name} tem ${b}. ${p1.name} tem ${quantos(it)} ${it.item} a mais que ${p2.name}?`,
+    `${p1.name} tem ${a} ${it.item}. ${p2.name} tem só ${b}. ${Cap(quantos(it))} ${it.item} ${p2.name} precisa ganhar para ficar com a mesma quantidade?`]);
+  return prob('pComparar', 'pc'+a+'-'+b, it.emoji, 'Problema', txt, d, `${a} − ${b} = ${d}`, 0, d + 7); };
+Q.pCompletar = (t) => { const p = person(), it = pick(WORD_ITEMS), tt = by(t,[6,10],[8,14],[10,18]), a = rnd(2, tt - 2), c = tt - a;
+  const txt = pick([
+    `${p.name} quer juntar ${tt} ${it.item}. Já tem ${a}. ${Cap(quantos(it))} ainda faltam?`,
+    `Para completar o álbum ${p.name} precisa de ${tt} ${it.item}. ${ela(p)} já tem ${a}. ${Cap(quantos(it))} faltam?`]);
+  return prob('pCompletar', 'pp'+tt+'-'+a, it.emoji, 'Problema', txt, c, `${a} + ${c} = ${tt}`, 0, tt); };
+Q.pGrupos = (t) => { const k = pick(t === 0 ? [2,3] : [2,3,5]), n = rnd(2, k === 5 ? 3 : 4), c = k * n, em = pick(['🍪','🍎','⭐','🍬']);
   const body = `<div class="objects-row">${Array.from({length:n}).map(()=>`<div class="object-group box">${objs(k,em)}</div>`).join('')}</div>`;
-  const cont = pick([['prato','pratos'],['caixa','caixas'],['cesta','cestas']]);
-  return prob('pGrupos', em, 'Problema', `Tem ${n} ${cont[1]} com ${k} ${em==='🍪'?'biscoitos':em==='🍎'?'maçãs':em==='⭐'?'estrelas':'balas'} em cada. Quantos há ao todo?`, c, `${Array(n).fill(k).join(' + ')} = ${c}`, 0, 28, body); };
-Q.pIdade = () => { const p1=person(); let p2=person(); while(p2.name===p1.name) p2=person(); const a=rnd(5,9), d=rnd(1,3), mais=Math.random()<.5, c=mais?a+d:a-d;
-  return prob('pIdade', '🎂', 'Problema', `${p1.name} tem ${a} anos. ${p2.name} tem ${d} ${d===1?'ano':'anos'} a ${mais?'mais':'menos'}. Quantos anos ${p2.name} tem?`, c, `${a} ${mais?'+':'−'} ${d} = ${c}`, 1, 14); };
-Q.pTurma = () => { const m=rnd(5,13), f=rnd(5,13), c=m+f;
-  return prob('pTurma', '🏫', 'Problema', `Na turma há ${m} meninos e ${f} meninas. Quantas crianças há na turma?`, c, `${m} + ${f} = ${c}`, 5, 30); };
-Q.pOnibus = () => { const a=rnd(6,14), d=rnd(1,5), s=rnd(1,6), c=a-d+s;
-  return prob('pOnibus', '🚌', 'Problema', `No ônibus havia ${a} pessoas. Desceram ${d} e subiram ${s}. Quantas pessoas ficaram no ônibus?`, c, `${a} − ${d} = ${a-d} e ${a-d} + ${s} = ${c}`, 1, 25); };
+  const cont = pick([['prato','pratos'],['caixa','caixas'],['cesta','cestas']]), nome = em==='🍪'?'biscoitos':em==='🍎'?'maçãs':em==='⭐'?'estrelas':'balas';
+  return prob('pGrupos', 'pr'+n+'x'+k+em, em, 'Problema', `Tem ${n} ${cont[1]} com ${k} ${nome} em cada. ${Cap(quantos({g:(em==='🍪'?'m':'f')}))} ${nome} há ao todo?`, c, `${Array(n).fill(k).join(' + ')} = ${c}`, 0, c + 6, body); };
+Q.pIdade = (t) => { const [p1,p2] = twoPeople(), a = rnd(5,9), d = rnd(1,3), mais = Math.random() < .5, c = mais ? a + d : a - d;
+  return prob('pIdade', 'pi'+a+(mais?'+':'-')+d, '🎂', 'Problema', `${p1.name} tem ${a} anos. ${p2.name} tem ${d} ${d===1?'ano':'anos'} a ${mais?'mais':'menos'}. Quantos anos ${p2.name} tem?`, c, `${a} ${mais?'+':'−'} ${d} = ${c}`, 1, 14); };
+Q.pTurma = () => { const m = rnd(5,13), f = rnd(5,13), c = m + f;
+  return prob('pTurma', 'pu'+m+'+'+f, '🏫', 'Problema', `Na turma há ${m} meninos e ${f} meninas. Quantas crianças há na turma?`, c, `${m} + ${f} = ${c}`, 5, 30); };
+Q.pDobro = () => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), a = rnd(2,9), c = a * 2;
+  return prob('pDobro', 'pd'+a, it.emoji, 'Problema', `${p1.name} tem ${a} ${it.item}. ${p2.name} tem o dobro. ${Cap(quantos(it))} ${it.item} ${p2.name} tem?`, c, `O dobro de ${a} é ${a} + ${a} = ${c}`, 0, 24); };
+Q.pMetade = () => { const p = person(), it = pick(WORD_ITEMS), h = rnd(2,8), tt = h * 2;
+  return prob('pMetade', 'pm'+tt, it.emoji, 'Problema', `${p.name} tem ${tt} ${it.item} e quer repartir igualmente com 1 amigo. Cada um fica com ${quantos(it)}?`, h, `${h} + ${h} = ${tt}`, 0, 16); };
+Q.pDuas = () => { const p = person(), it = pick(WORD_ITEMS); let a, b, c, r; do { a = rnd(4,10); b = rnd(2,7); c = rnd(2,9); r = a + b - c; } while (r < 1);
+  return prob('pDuas', 'p2'+a+b+c, it.emoji, 'Problema', `${p.name} tinha ${a} ${it.item}, ganhou ${b} e depois deu ${c}. Com ${quantos(it)} ${it.item} ficou?`, r, `${a} + ${b} = ${a+b} e ${a+b} − ${c} = ${r}`, 0, 20); };
+Q.pOnibus = () => { const a = rnd(6,14), d = rnd(1,5), s = rnd(1,6), c = a - d + s;
+  return prob('pOnibus', 'po'+a+d+s, '🚌', 'Problema', `Dentro do ônibus estavam ${a} pessoas. Desceram ${d} e subiram ${s}. Quantas pessoas ficaram no ônibus?`, c, `${a} − ${d} = ${a-d} e ${a-d} + ${s} = ${c}`, 1, 25); };
 
-// ---- Nível 5: números e formas ----
-Q.dezUni = () => { const t=rnd(1,4), u=rnd(0,9), n=t*10+u, form=pick(['blocos','texto','texto2']);
-  if(form==='blocos') return { skill:'dezUni', icon:'🧱', modeTag:'Dezena e unidade', label:'Que número é este? Cada barra vale 10.', body:blocksHTML(t,u), options:distractors(n,3,10,60), correct:n, explain:`${t} ${t===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} = ${n}` };
-  if(form==='texto') return { skill:'dezUni', icon:'🧱', modeTag:'Dezena e unidade', label:`${t} ${t===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} formam qual número?`, body:blocksHTML(t,u), options:distractors(n,3,10,60), correct:n, explain:`${t*10} + ${u} = ${n}` };
-  return { skill:'dezUni', icon:'🧱', modeTag:'Dezena e unidade', label:`No número ${n}, quantas dezenas há?`, body:eqRow(nb(n)), options:distractors(t,3,0,9), correct:t, explain:`${n} tem ${t} ${t===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'}.` }; };
-Q.antSuc = () => { const n=rnd(3,60), k=pick(['dep','ant','ent']);
-  if(k==='dep') return { skill:'antSuc', icon:'➡️', modeTag:'Antes e depois', label:`Qual número vem DEPOIS do ${n}?`, body:eqRow(nb(n)+sym('→')+nb('?',1)), options:distractors(n+1,3,1,70), correct:n+1, explain:`Depois do ${n} vem o ${n+1}.` };
-  if(k==='ant') return { skill:'antSuc', icon:'⬅️', modeTag:'Antes e depois', label:`Qual número vem ANTES do ${n}?`, body:eqRow(nb('?',1)+sym('→')+nb(n)), options:distractors(n-1,3,0,70), correct:n-1, explain:`Antes do ${n} vem o ${n-1}.` };
-  return { skill:'antSuc', icon:'↔️', modeTag:'Antes e depois', label:`Qual número fica ENTRE ${n-1} e ${n+1}?`, body:eqRow(nb(n-1)+nb('?',1)+nb(n+1)), options:distractors(n,3,1,70), correct:n, explain:`Entre ${n-1} e ${n+1} fica o ${n}.` }; };
-Q.comparar = () => { let a=rnd(1,60), b=rnd(1,60); while(a===b) b=rnd(1,60); const big=Math.random()<.5, c=big?Math.max(a,b):Math.min(a,b);
-  return { skill:'comparar', icon:'⚖️', modeTag:'Comparando', label:`Toque no número ${big?'MAIOR':'MENOR'}!`, body:'', options:shuffle([a,b]), correct:c, twoOnly:true, explain:`${Math.max(a,b)} é maior que ${Math.min(a,b)}.` }; };
-Q.sinal = () => { const a=rnd(1,40), eq=Math.random()<.2, b=eq?a:rnd(1,40), c=a>b?'>':a<b?'<':'=';
-  return { skill:'sinal', icon:'🐊', modeTag:'Sinais', label:'Qual sinal vai no meio? (a boca abre para o maior)', body:eqRow(nb(a)+nb('?',1)+nb(b)), options:['<','=','>'], correct:c, explain:`${a} ${c} ${b}` }; };
-Q.ordenar = () => { const s=new Set(); while(s.size<3) s.add(rnd(1,50)); const arr=[...s], mn=Math.min(...arr), mx=Math.max(...arr), big=Math.random()<.5, c=big?mx:mn;
-  return { skill:'ordenar', icon:'🔀', modeTag:'Ordenando', label:`Qual é o número ${big?'MAIOR':'MENOR'}?`, body:eqRow(shuffle(arr).map(v=>nb(v)).join('')), options:shuffle(arr), correct:c, explain:`Do menor para o maior: ${[...arr].sort((x,y)=>x-y).join(', ')}.` }; };
-Q.parImpar = () => { const even=Math.random()<.5, c=even?rnd(1,20)*2:rnd(1,20)*2-1, o=[];
-  while(o.length<3){ const v=rnd(2,40); if((v%2===0)!==even && !o.includes(v) && v!==c) o.push(v); }
-  return { skill:'parImpar', icon:even?'🟢':'🔵', modeTag:'Par ou ímpar', label:`Qual destes números é ${even?'PAR':'ÍMPAR'}?`, body:'', options:shuffle([c,...o]), correct:c, explain:`${c} é ${even?'par':'ímpar'}.` }; };
-Q.dobroMeta = () => { const dob=Math.random()<.55;
-  if(dob){ const a=rnd(1,10); return { skill:'dobroMeta', icon:'✌️', modeTag:'Dobro', label:`Qual é o DOBRO de ${a}?`, body:eqRow(nb(a)+sym('+')+nb(a)+sym('=')+nb('?',1)), options:distractors(a*2,3,0,24), correct:a*2, explain:`${a} + ${a} = ${a*2}` }; }
-  const h=rnd(1,10); return { skill:'dobroMeta', icon:'✂️', modeTag:'Metade', label:`Qual é a METADE de ${h*2}?`, body:eqRow(nb('?',1)+sym('+')+nb('?',1)+sym('=')+nb(h*2)), options:distractors(h,3,0,12), correct:h, explain:`${h} + ${h} = ${h*2}` }; };
-Q.formas = () => { const k=pick(['circulo','quadrado','triangulo','retangulo']), nome={circulo:'círculo',quadrado:'quadrado',triangulo:'triângulo',retangulo:'retângulo'}, lados={circulo:0,quadrado:4,triangulo:3,retangulo:4};
-  if(Math.random()<.6) return { skill:'formas', icon:'🔷', modeTag:'Formas', label:'Que forma é esta?', body:`<div class="objects-row">${shapeSVG(k)}</div>`, options:strOpts(nome[k],Object.values(nome),3), correct:nome[k], explain:`É um ${nome[k]}.` };
-  return { skill:'formas', icon:'🔷', modeTag:'Formas', label:`Quantos lados tem o ${nome[k]}?`, body:`<div class="objects-row">${shapeSVG(k)}</div>`, options:distractors(lados[k],3,0,6), correct:lados[k], explain:`O ${nome[k]} tem ${lados[k]} ${lados[k]===1?'lado':'lados'}.` }; };
-Q.extenso = () => { const n=rnd(1,30), w=numWord(n);
-  if(Math.random()<.5){ const pool=new Set([w]); distractors(n,5,1,30).forEach(x=>pool.add(numWord(x))); const o=strOpts(w,[...pool],3);
-    return { skill:'extenso', icon:'🔤', modeTag:'Por extenso', label:'Como se escreve este número?', body:eqRow(nb(n)), options:o, correct:w, explain:`${n} se escreve ${w}.` }; }
-  return { skill:'extenso', icon:'🔤', modeTag:'Por extenso', label:'Qual número está escrito?', body:`<div class="word-text big">${w.toUpperCase()}</div>`, say:w, options:distractors(n,3,1,30), correct:n, explain:`${w} é ${n}.` }; };
-Q.saltos = () => { const step=pick([2,5,10]), start=step===10?rnd(0,5)*10:rnd(0,4)*step, seq=[0,1,2,3,4].map(i=>start+i*step), bi=rnd(1,4), c=seq[bi];
-  return { skill:'saltos', icon:'🦘', modeTag:`De ${step} em ${step}`, label:`Complete: contando de ${step} em ${step}`, body:eqRow(seq.map((v,i)=>nb(i===bi?'?':v,i===bi)).join('')), options:distractors(c,3,0,start+4*step+step), correct:c, explain:`Somamos ${step} a cada passo.` }; };
+// ---------- Nível 5: números e formas ----------
+Q.dezUni = (t) => { const tt = by(t,[1,2],[1,4],[2,5]), u = rnd(0,9), n = tt*10 + u, form = t === 0 ? 'blocos' : pick(['blocos','texto','texto2']);
+  if (form === 'blocos') return { skill:'dezUni', sig:'du'+n, icon:'🧱', modeTag:'Dezena e unidade', label:'Que número é este? Cada barra vale 10.', say:'Que número é este? Cada barra vale dez.', body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} = ${n}` };
+  if (form === 'texto') return { skill:'dezUni', sig:'du'+n, icon:'🧱', modeTag:'Dezena e unidade', label:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} formam qual número?`, body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt*10} + ${u} = ${n}` };
+  return { skill:'dezUni', sig:'dd'+n, icon:'🧱', modeTag:'Dezena e unidade', label:`No número ${n}, quantas dezenas há?`, body:eqRow(nb(n)), options:distractors(tt,3,0,9), correct:tt, explain:`${n} tem ${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'}.` }; };
+Q.antSuc = (t) => { const n = by(t,[3,19],[10,50],[20,89]), k = pick(['dep','ant','ent']);
+  if (k === 'dep') return { skill:'antSuc', sig:'ad'+n, icon:'➡️', modeTag:'Antes e depois', label:`Qual número vem DEPOIS do ${n}?`, body:eqRow(nb(n)+sym('→')+nb('?',1)), options:distractors(n+1,3,1,n+8), correct:n+1, explain:`Depois do ${n} vem o ${n+1}.` };
+  if (k === 'ant') return { skill:'antSuc', sig:'aa'+n, icon:'⬅️', modeTag:'Antes e depois', label:`Qual número vem ANTES do ${n}?`, body:eqRow(nb('?',1)+sym('→')+nb(n)), options:distractors(n-1,3,0,n+6), correct:n-1, explain:`Antes do ${n} vem o ${n-1}.` };
+  return { skill:'antSuc', sig:'ae'+n, icon:'↔️', modeTag:'Antes e depois', label:`Qual número fica ENTRE ${n-1} e ${n+1}?`, body:eqRow(nb(n-1)+nb('?',1)+nb(n+1)), options:distractors(n,3,1,n+7), correct:n, explain:`Entre ${n-1} e ${n+1} fica o ${n}.` }; };
+Q.comparar = (t) => { const mx = [20, 50, 99][t]; let a = rnd(1,mx), b = rnd(1,mx); while (a === b) b = rnd(1,mx); const big = Math.random() < .5, c = big ? Math.max(a,b) : Math.min(a,b);
+  return { skill:'comparar', sig:'cp'+a+','+b, icon:'⚖️', modeTag:'Comparando', label:`Toque no número ${big?'MAIOR':'MENOR'}!`, body:'', options:shuffle([a,b]), correct:c, twoOnly:true, explain:`${Math.max(a,b)} é maior que ${Math.min(a,b)}.` }; };
+Q.sinal = (t) => { const mx = [20, 40, 99][t], a = rnd(1,mx), eq = Math.random() < .2, b = eq ? a : rnd(1,mx), c = a > b ? '>' : a < b ? '<' : '=';
+  return { skill:'sinal', sig:'sn'+a+','+b, icon:'🐊', modeTag:'Sinais', label:'Qual sinal vai no meio? (a boca abre para o maior)', say:'Qual sinal vai no meio? A boca do jacaré abre para o maior.', body:eqRow(nb(a)+nb('?',1)+nb(b)), options:['<','=','>'], correct:c, explain:`${a} ${c} ${b}` }; };
+Q.ordenar = (t) => { const mx = [20, 50, 99][t], s = new Set(); while (s.size < 3) s.add(rnd(1,mx)); const arr = [...s], mn = Math.min(...arr), mxv = Math.max(...arr), big = Math.random() < .5, c = big ? mxv : mn;
+  return { skill:'ordenar', sig:'or'+arr.sort((x,y)=>x-y).join(','), icon:'🔀', modeTag:'Ordenando', label:`Qual é o número ${big?'MAIOR':'MENOR'}?`, body:eqRow(shuffle(arr).map(v=>nb(v)).join('')), options:shuffle(arr), correct:c, explain:`Do menor para o maior: ${[...arr].sort((x,y)=>x-y).join(', ')}.` }; };
+Q.parImpar = () => { const even = Math.random() < .5, c = even ? rnd(1,20)*2 : rnd(1,20)*2 - 1, o = [];
+  while (o.length < 3) { const v = rnd(2,40); if ((v % 2 === 0) !== even && !o.includes(v) && v !== c) o.push(v); }
+  return { skill:'parImpar', sig:'pi'+c+even, icon:even?'🟢':'🔵', modeTag:'Par ou ímpar', label:`Qual destes números é ${even?'PAR':'ÍMPAR'}?`, body:'', options:shuffle([c,...o]), correct:c, explain:`${c} é ${even?'par':'ímpar'}.` }; };
+Q.dobroMeta = () => { const dob = Math.random() < .55;
+  if (dob) { const a = rnd(1,10); return { skill:'dobroMeta', sig:'db'+a, icon:'✌️', modeTag:'Dobro', label:`Qual é o DOBRO de ${a}?`, body:eqRow(nb(a)+sym('+')+nb(a)+sym('=')+nb('?',1)), options:distractors(a*2,3,0,24), correct:a*2, explain:`${a} + ${a} = ${a*2}` }; }
+  const h = rnd(1,10); return { skill:'dobroMeta', sig:'mt'+h, icon:'✂️', modeTag:'Metade', label:`Qual é a METADE de ${h*2}?`, body:eqRow(nb('?',1)+sym('+')+nb('?',1)+sym('=')+nb(h*2)), options:distractors(h,3,0,12), correct:h, explain:`${h} + ${h} = ${h*2}` }; };
+Q.formas = () => { const k = pick(['circulo','quadrado','triangulo','retangulo']), nome = {circulo:'círculo',quadrado:'quadrado',triangulo:'triângulo',retangulo:'retângulo'}, lados = {circulo:0,quadrado:4,triangulo:3,retangulo:4}, ask = Math.random() < .6;
+  if (ask) return { skill:'formas', sig:'fn'+k, icon:'🔷', modeTag:'Formas', label:'Que forma é esta?', body:`<div class="objects-row">${shapeSVG(k)}</div>`, options:strOpts(nome[k],Object.values(nome),3), correct:nome[k], explain:`É um ${nome[k]}.` };
+  return { skill:'formas', sig:'fl'+k, icon:'🔷', modeTag:'Formas', label:`Quantos lados tem o ${nome[k]}?`, body:`<div class="objects-row">${shapeSVG(k)}</div>`, options:distractors(lados[k],3,0,6), correct:lados[k], explain:`O ${nome[k]} tem ${lados[k]} ${lados[k]===1?'lado':'lados'}.` }; };
+Q.extenso = () => { const n = rnd(1,30), w = numWord(n);
+  if (Math.random() < .5) { const pool = new Set([w]); distractors(n,5,1,30).forEach(x => pool.add(numWord(x))); const o = strOpts(w,[...pool],3);
+    return { skill:'extenso', sig:'ex'+n, icon:'🔤', modeTag:'Por extenso', label:'Como se escreve este número?', body:eqRow(nb(n)), options:o, correct:w, explain:`${n} se escreve ${w}.` }; }
+  return { skill:'extenso', sig:'ey'+n, icon:'🔤', modeTag:'Por extenso', label:'Qual número está escrito?', body:`<div class="word-text big">${w.toUpperCase()}</div>`, say:w, options:distractors(n,3,1,30), correct:n, explain:`${w} é ${n}.` }; };
+Q.saltos = () => { const step = pick([2,5,10]), start = step === 10 ? rnd(0,5)*10 : rnd(0,4)*step, seq = [0,1,2,3,4].map(i => start + i*step), bi = rnd(1,4), c = seq[bi];
+  return { skill:'saltos', sig:'sa'+seq.join(','), icon:'🦘', modeTag:`De ${step} em ${step}`, label:`Complete: contando de ${step} em ${step}`, body:eqRow(seq.map((v,i)=>nb(i===bi?'?':v,i===bi)).join('')), options:distractors(c,3,0,start+4*step+step), correct:c, explain:`Somamos ${step} a cada passo.` }; };
 
-// ---- Nível 6: mundo real ----
-Q.dinheiro = () => { const n=rnd(2,4), vals=Array.from({length:n},()=>pick([1,2,5,10])), t=vals.reduce((a,b)=>a+b,0);
-  return { skill:'dinheiro', icon:'💰', modeTag:'Dinheiro', label:'Quanto dinheiro há aqui?', body:`<div class="objects-row money-row">${vals.map(moneyChip).join('')}</div>`, options:distractors(t,3,1,40), correct:t, fmt:v=>`R$ ${v}`, say:`Quanto dinheiro há aqui?`, explain:`${vals.join(' + ')} = ${t} reais.` }; };
-Q.troco = () => { const it=pick([['um pirulito','🍭'],['um caderno','📓'],['uma bola','⚽'],['um suco','🧃'],['um lápis','✏️']]), preco=rnd(1,8), pago=preco<=5?pick([5,10]):10, t=pago-preco, p=person();
-  return prob('troco', it[1], 'Dinheiro', `${p.name} comprou ${it[0]} por R$ ${preco}. Pagou com R$ ${pago}. Quanto ${p.g==='f'?'ela':'ele'} recebeu de troco?`, t, `${pago} − ${preco} = ${t} reais.`, 0, 12, `<div class="objects-row money-row">${moneyChip(pago===10?10:5)}</div>`); };
-Q.relogio = () => { const h=rnd(1,12);
-  return { skill:'relogio', icon:'🕒', modeTag:'Relógio', label:'Que horas são? (ponteiro grande no 12)', body:`<div class="objects-row">${clockSVG(h)}</div>`, options:distractors(h,3,1,12), correct:h, fmt:v=>`${v} ${v===1?'hora':'horas'}`, say:'Que horas são?', explain:`O ponteiro pequeno está no ${h}: são ${h} ${h===1?'hora':'horas'}.` }; };
-Q.calendario = () => { const k=pick(['dia','dia','antes','mes','sem']);
-  if(k==='dia'){ const i=rnd(0,6), c=DAYS[(i+1)%7]; return { skill:'calendario', icon:'📅', modeTag:'Calendário', label:`Hoje é ${DAYS[i]}. Que dia será amanhã?`, body:'', options:strOpts(c,DAYS,3), correct:c, explain:`Depois de ${DAYS[i]} vem ${c}.` }; }
-  if(k==='antes'){ const i=rnd(0,6), c=DAYS[(i+6)%7]; return { skill:'calendario', icon:'📅', modeTag:'Calendário', label:`Hoje é ${DAYS[i]}. Que dia foi ontem?`, body:'', options:strOpts(c,DAYS,3), correct:c, explain:`Antes de ${DAYS[i]} vem ${c}.` }; }
-  if(k==='mes'){ const i=rnd(0,10), c=MONTHS[i+1]; return { skill:'calendario', icon:'🗓️', modeTag:'Calendário', label:`Que mês vem depois de ${MONTHS[i]}?`, body:'', options:strOpts(c,MONTHS,3), correct:c, explain:`Depois de ${MONTHS[i]} vem ${c}.` }; }
-  return { skill:'calendario', icon:'📅', modeTag:'Calendário', label:'Quantos dias tem uma semana?', body:'', options:distractors(7,3,3,12), correct:7, explain:'A semana tem 7 dias.' }; };
-Q.grafico = () => { const pool=[['🍎','maçãs'],['🍌','bananas'],['🍇','uvas'],['🍓','morangos'],['🍊','laranjas']], items=shuffle(pool).slice(0,3).map(x=>({e:x[0],nome:x[1],n:rnd(1,8)}));
-  const ns=new Set(items.map(i=>i.n)); if(ns.size<3) return Q.grafico();
-  const k=pick(['mais','menos','qtd']);
-  const sorted=[...items].sort((a,b)=>b.n-a.n);
-  const body=`<div class="objects-row">${barChart(items)}</div>`;
-  if(k==='qtd'){ const it=pick(items); return { skill:'grafico', icon:'📊', modeTag:'Gráfico', label:`Quantas ${it.nome} aparecem no gráfico?`, body, options:distractors(it.n,3,0,10), correct:it.n, explain:`A coluna de ${it.nome} tem ${it.n}.` }; }
-  const t=k==='mais'?sorted[0]:sorted[2];
-  return { skill:'grafico', icon:'📊', modeTag:'Gráfico', label:`Qual fruta aparece ${k==='mais'?'MAIS':'MENOS'} vezes?`, body, options:items.map(i=>i.e), shuf:true, correct:t.e, explain:`${t.e} tem ${t.n}.` }; };
+// ---------- Nível 6: mundo real ----------
+Q.dinheiro = (t) => { const n = by(t,[2,3],[2,3],[3,4]), pool = t === 0 ? [1,2] : t === 1 ? [1,2,5] : [1,2,5,10], vals = Array.from({length:n},()=>pick(pool)), tt = vals.reduce((a,b)=>a+b,0);
+  return { skill:'dinheiro', sig:'di'+vals.join(','), icon:'💰', modeTag:'Dinheiro', label:'Quanto dinheiro há aqui?', body:`<div class="objects-row money-row">${vals.map(moneyChip).join('')}</div>`, options:distractors(tt,3,1,tt+8), correct:tt, fmt:v=>`R$ ${v}`, say:'Quanto dinheiro há aqui? Some tudo.', explain:`${vals.join(' + ')} = ${tt} reais.` }; };
+Q.troco = () => { const it = pick([['um pirulito','🍭'],['um caderno','📓'],['uma bola','⚽'],['um suco','🧃'],['um lápis','✏️'],['um sorvete','🍦'],['uma fita','🎀']]), preco = rnd(1,8), pago = preco <= 5 ? pick([5,10]) : 10, tt = pago - preco, p = person();
+  return prob('troco', 'tr'+it[1]+preco+pago, it[1], 'Dinheiro', `${p.name} comprou ${it[0]} por R$ ${preco}. Pagou com R$ ${pago}. Quanto ${p.g==='f'?'ela':'ele'} recebeu de troco?`, tt, `${pago} − ${preco} = ${tt} reais.`, 0, 12, `<div class="objects-row money-row">${moneyChip(pago===10?10:5)}</div>`); };
+Q.relogio = () => { const h = rnd(1,12);
+  return { skill:'relogio', sig:'rl'+h, icon:'🕒', modeTag:'Relógio', label:'Que horas são? (ponteiro grande no 12)', say:'Que horas são? O ponteiro grande está no doze.', body:`<div class="objects-row">${clockSVG(h)}</div>`, options:distractors(h,3,1,12), correct:h, fmt:v=>`${v} ${v===1?'hora':'horas'}`, explain:`O ponteiro pequeno está no ${h}: são ${h} ${h===1?'hora':'horas'}.` }; };
+Q.calendario = () => { const k = pick(['dia','antes','mes','sem']);
+  if (k === 'dia') { const i = rnd(0,6), c = DAYS[(i+1)%7]; return { skill:'calendario', sig:'cd'+i, icon:'📅', modeTag:'Calendário', label:`Hoje é ${DAYS[i]}. Que dia será amanhã?`, body:'', options:strOpts(c,DAYS,3), correct:c, explain:`Depois de ${DAYS[i]} vem ${c}.` }; }
+  if (k === 'antes') { const i = rnd(0,6), c = DAYS[(i+6)%7]; return { skill:'calendario', sig:'ca'+i, icon:'📅', modeTag:'Calendário', label:`Hoje é ${DAYS[i]}. Que dia foi ontem?`, body:'', options:strOpts(c,DAYS,3), correct:c, explain:`Antes de ${DAYS[i]} vem ${c}.` }; }
+  if (k === 'mes') { const i = rnd(0,10), c = MONTHS[i+1]; return { skill:'calendario', sig:'cm'+i, icon:'🗓️', modeTag:'Calendário', label:`Que mês vem depois de ${MONTHS[i]}?`, body:'', options:strOpts(c,MONTHS,3), correct:c, explain:`Depois de ${MONTHS[i]} vem ${c}.` }; }
+  return { skill:'calendario', sig:'cs', icon:'📅', modeTag:'Calendário', label:'Quantos dias tem uma semana?', body:'', options:distractors(7,3,3,12), correct:7, explain:'A semana tem 7 dias.' }; };
+Q.grafico = (t) => { const pool = [['🍎','maçãs'],['🍌','bananas'],['🍇','uvas'],['🍓','morangos'],['🍊','laranjas']];
+  let items, ns; do { items = shuffle(pool).slice(0,3).map(x=>({e:x[0],nome:x[1],n:rnd(1,8)})); ns = new Set(items.map(i=>i.n)); } while (ns.size < 3);
+  const k = t === 0 ? 'qtd' : pick(['mais','menos','qtd']), sorted = [...items].sort((a,b)=>b.n-a.n), body = `<div class="objects-row">${barChart(items)}</div>`;
+  if (k === 'qtd') { const it = pick(items); return { skill:'grafico', sig:'gq'+items.map(i=>i.e+i.n).join(''), icon:'📊', modeTag:'Gráfico', label:`${it.nome==='uvas'||it.nome==='laranjas'||it.nome==='maçãs'||it.nome==='bananas'?'Quantas':'Quantos'} ${it.nome} aparecem no gráfico?`, body, options:distractors(it.n,3,0,10), correct:it.n, explain:`A coluna de ${it.nome} tem ${it.n}.` }; }
+  const tg = k === 'mais' ? sorted[0] : sorted[2];
+  return { skill:'grafico', sig:'gm'+items.map(i=>i.e+i.n).join('')+k, icon:'📊', modeTag:'Gráfico', label:`Qual fruta aparece ${k==='mais'?'MAIS':'MENOS'} vezes?`, body, options:items.map(i=>i.e), correct:tg.e, explain:`${tg.e} tem ${tg.n}.` }; };
 const MEDS = [
   ['Qual é mais PESADO?',['🐘','🐭'],'🐘'], ['Qual é mais PESADO?',['🚛','🚲'],'🚛'], ['Qual é mais LEVE?',['🪶','🪨'],'🪶'], ['Qual é mais LEVE?',['🎈','🧱'],'🎈'],
   ['Qual é mais ALTO?',['🦒','🐕'],'🦒'], ['Qual é mais ALTO?',['🌳','🌱'],'🌳'], ['Qual é mais BAIXO?',['🏢','🏠'],'🏠'],
   ['Qual é mais COMPRIDO?',['🐍','🐛'],'🐍'], ['Qual é mais RÁPIDO?',['🚀','🐢'],'🚀'], ['Qual é mais RÁPIDO?',['✈️','🚲'],'✈️'], ['Qual é mais LENTO?',['🐌','🐇'],'🐌'],
   ['Qual cabe mais ÁGUA?',['🛁','🥛'],'🛁'], ['Qual cabe mais ÁGUA?',['🪣','🥤'],'🪣'], ['Qual é maior?',['🐋','🐟'],'🐋']
 ];
-Q.medidas = () => { const m=pick(MEDS), o=shuffle(m[1]);
-  return { skill:'medidas', icon:'📏', modeTag:'Medidas', label:m[0], body:'', options:o, correct:m[2], twoOnly:true, explain:`${m[2]} é a resposta.` }; };
+Q.medidas = () => { const m = pick(MEDS), o = shuffle(m[1]);
+  return { skill:'medidas', sig:'md'+m[0]+m[2], icon:'📏', modeTag:'Medidas', label:m[0], body:'', options:o, correct:m[2], twoOnly:true, explain:`${m[2]} é a resposta.` }; };
 
-// ---- níveis e sorteio adaptativo ----
-const LEVEL_SKILLS = {
-  1: ['contar','contar','somarVis','somarVis','subVis','subVis','maisMenos'],
-  2: ['somar','somar','subtrair','subtrair','falta','dez'],
-  3: ['tripla','somaGrande','subGrande','sequencia','falta','subtrair'],
-  4: ['pJuntar','pGanhar','pTirar','pSobrar','pComparar','pCompletar','pDuas','pDobro','pMetade','pGrupos','pIdade','pTurma','pOnibus'],
-  5: ['dezUni','dezUni','antSuc','antSuc','comparar','sinal','ordenar','parImpar','dobroMeta','formas','extenso','saltos'],
-  6: ['dinheiro','troco','relogio','relogio','calendario','grafico','medidas','medidas']
+// ---------- níveis: cada nível tem 3 faixas (comecinho, meio e final do jogo) ----------
+const LEVEL_TIERS = {
+  1: [['contar','contar','maisMenos'],            ['contar','contarMix','maisMenos'],              ['contar','contarMix','maisMenos']],
+  2: [['somarVis','somarVis','somar','subtrair'], ['somar','subtrair','somar','subtrair','dez'],   ['somar','subtrair','falta','dez','subtrair']],
+  3: [['somaDez','sequencia','tripla'],           ['somaGrande','subGrande','tripla','sequencia'], ['somaGrande','subGrande','subGrande','sequencia','tripla']],
+  4: [['pJuntar','pGanhar','pTirar','pSobrar'],   ['pComparar','pCompletar','pGrupos','pTurma','pIdade','pJuntar','pTirar'], ['pDuas','pOnibus','pDobro','pMetade','pComparar','pCompletar']],
+  5: [['dezUni','antSuc','comparar','formas'],    ['antSuc','comparar','sinal','ordenar','parImpar','formas'], ['extenso','dobroMeta','saltos','ordenar','sinal','dezUni']],
+  6: [['medidas','calendario','relogio'],         ['dinheiro','relogio','grafico','calendario'],   ['troco','dinheiro','grafico','relogio','calendario']]
 };
+const LEVEL_SKILLS = {};
+Object.keys(LEVEL_TIERS).forEach(l => { LEVEL_SKILLS[l] = [].concat(...LEVEL_TIERS[l]); });
 
 
 // ============================================================
@@ -827,9 +888,9 @@ const DIGITS = {
   8:[[[50,48],[34,40],[30,26],[40,12],[50,10],[60,12],[70,26],[66,40],[50,48],[30,58],[26,74],[36,88],[50,90],[64,88],[74,74],[70,58],[50,48]]],
   9:[[[70,30],[62,14],[48,10],[34,16],[28,32],[34,46],[50,52],[66,46],[72,30],[72,60],[66,80],[52,90],[36,88],[28,78]]]
 };
-Q.escrever = () => { const d=rnd(0,9), e=pick(OBJ_POOL);
-  return { skill:'escrever', kind:'trace', digit:d, icon:e, modeTag:'Escrever número', label:`Escreva o número ${d} (${numWord(d)})`, say:`${numWord(d)}. O número ${numWord(d)}.`,
-    body:`<div class="objects-row">${d? group(d,e) : '<div class="word-text">Nenhum objeto</div>'}</div>`, options:[], correct:d, explain:`${d} é ${numWord(d)}.` }; };
+Q.escrever = () => { if(!state.digitPool||!state.digitPool.length) state.digitPool=shuffle([0,1,2,3,4,5,6,7,8,9]); const d=state.digitPool.pop(), o=pickObj();
+  return { skill:'escrever', sig:'e'+d, kind:'trace', digit:d, icon:o.e, modeTag:'Escrever número', label:`Escreva o número ${d} (${numWord(d)})`, say:`${numWord(d)}. O número ${numWord(d)}.`,
+    body:d ? manyOf(d,o.e) : '<div class="word-text">Zero: nenhum objeto</div>', options:[], correct:d, explain:`${d} é ${numWord(d)}.` }; };
 
 const TR = { raf:0, cv:null, ctx:null, strokes:[], dens:[], idx:0, cur:[], drawing:false, fails:0, done:true, t0:0, size:300, dpr:1 };
 function densify(poly, step){
@@ -878,12 +939,12 @@ function trDraw(finished){
   const ctx=TR.ctx; if(!ctx||!TR.cv) return;
   if(document.getElementById('game').classList.contains('hidden')&&!finished) return;
   const S=TR.size*TR.dpr,k=S/100; ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,S,S);
-  ctx.strokeStyle='rgba(255,255,255,.14)'; ctx.lineWidth=1.2*TR.dpr; ctx.setLineDash([6*TR.dpr,6*TR.dpr]);
+  ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.lineWidth=1.2*TR.dpr; ctx.setLineDash([6*TR.dpr,6*TR.dpr]);
   [10,50,90].forEach(y=>{ctx.beginPath();ctx.moveTo(4*k,y*k);ctx.lineTo(96*k,y*k);ctx.stroke();}); ctx.setLineDash([]);
   const path=poly=>{ctx.beginPath();poly.forEach(([x,y],i)=>i?ctx.lineTo(x*k,y*k):ctx.moveTo(x*k,y*k));};
   ctx.lineCap='round'; ctx.lineJoin='round';
-  TR.strokes.forEach((st,i)=>{ const done=i<TR.idx; path(st); ctx.strokeStyle=done?'rgba(74,222,128,.9)':'rgba(255,255,255,.2)'; ctx.lineWidth=(done?8:12)*k; ctx.stroke();
-    if(!done){ path(st); ctx.strokeStyle='rgba(255,255,255,.75)'; ctx.lineWidth=1.2*k; ctx.setLineDash([2.2*k,3*k]); ctx.stroke(); ctx.setLineDash([]); } });
+  TR.strokes.forEach((st,i)=>{ const done=i<TR.idx; path(st); ctx.strokeStyle=done?'rgba(74,222,128,.95)':'rgba(255,255,255,.30)'; ctx.lineWidth=(done?8:14)*k; ctx.stroke();
+    if(!done){ path(st); ctx.strokeStyle='#FFE66D'; ctx.lineWidth=1.8*k; ctx.setLineDash([2.6*k,3.2*k]); ctx.stroke(); ctx.setLineDash([]); } });
   if(finished||TR.idx>=TR.strokes.length) return;
   const st=TR.strokes[TR.idx], d=TR.dens[TR.idx], pulse=1+0.18*Math.sin((performance.now()-TR.t0)/180);
   ctx.beginPath(); ctx.arc(st[0][0]*k,st[0][1]*k,6.5*k*pulse,0,7); ctx.fillStyle='#4ADE80'; ctx.fill(); ctx.lineWidth=1.5*k; ctx.strokeStyle='#fff'; ctx.stroke();
@@ -893,7 +954,7 @@ function trDraw(finished){
     ctx.font=`${12*k}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('👆',px*k+3*k,py*k+6*k);
     ctx.beginPath(); ctx.arc(px*k,py*k,3*k,0,7); ctx.fillStyle='rgba(255,230,109,.95)'; ctx.fill();
   }
-  if(TR.cur.length>1){ path(TR.cur); ctx.strokeStyle='#FF6B6B'; ctx.lineWidth=7*k; ctx.stroke(); }
+  if(TR.cur.length>1){ path(TR.cur); ctx.strokeStyle='#FF8FA3'; ctx.lineWidth=7*k; ctx.stroke(); }
 }
 window.addEventListener('resize',()=>{ if(TR.cv&&TR.cv.isConnected) sizeTrace(); });
 
@@ -983,11 +1044,11 @@ const STICKERS=[
 // ============================================================
 //  ESTADO E FLUXO DO JOGO
 // ============================================================
-let state={phase:0,qIndex:0,score:0,lives:3,streak:0,errors:0,correct:0,maxStreak:0,qWrong:false,current:null,locked:false,lastSkill:''};
+let state={seen:new Set(),digitPool:null,phase:0,qIndex:0,score:0,lives:3,streak:0,errors:0,correct:0,maxStreak:0,qWrong:false,current:null,locked:false,lastSkill:''};
 function recommendedLevel(p){ if(!p) return 0; for(let n=0;n<=6;n++){ if(n===0&&(p.stars[1]||0)>0) continue; if((p.stars[n]||0)<3) return n; } return 6; }
 
-function chooseSkill(level){
-  const base=LEVEL_SKILLS[level], list=[...new Set(base)], pr=P();
+function chooseSkill(level,tier){
+  const base=(LEVEL_TIERS[level]&&LEVEL_TIERS[level][tier])||LEVEL_SKILLS[level], list=[...new Set(base)], pr=P();
   const w=list.map(sk=>{ const st=pr&&pr.skills[sk]; let wt=1.4;
     if(st){ const n=st.ok+st.err; if(n>=3){ const acc=st.ok/n; wt=acc<0.6?3:acc<0.85?1.6:(n>=8?0.5:0.9); } else wt=1.2; }
     if(sk===state.lastSkill&&list.length>1) wt*=0.2;
@@ -997,7 +1058,7 @@ function chooseSkill(level){
 function selectPhase(btn,p){ document.querySelectorAll('#phaseSelect .phase-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); state.phase=p; }
 function startGame(){
   primeAudio(); touchDay();
-  Object.assign(state,{qIndex:0,score:0,lives:3,streak:0,errors:0,correct:0,maxStreak:0,qWrong:false,lastSkill:''});
+  Object.assign(state,{qIndex:0,score:0,lives:3,streak:0,errors:0,correct:0,maxStreak:0,qWrong:false,lastSkill:'',seen:new Set(),digitPool:null});
   window.__learnedBefore=masteredSkills(P());
   show('game'); loadQuestion();
 }
@@ -1005,8 +1066,11 @@ function loadQuestion(){
   stopTrace(); state.locked=false; state.qWrong=false;
   const cfg=CONFIG[state.phase];
   if(state.qIndex>=cfg.questions) return endGame(true);
-  const skill=chooseSkill(state.phase); state.lastSkill=skill;
-  let q; try{ q=Q[skill](); }catch(e){ q=Q.somar(); }
+  const tier=Math.min(2,Math.floor(state.qIndex*3/cfg.questions));
+  let q,tries=0,skill;
+  do{ skill=chooseSkill(state.phase,tier); try{ q=Q[skill](tier); }catch(e){ q=Q.somar(tier); } tries++; }
+  while(state.seen.has(q.sig||(q.skill+'|'+q.label+'|'+q.correct)) && tries<60);
+  state.seen.add(q.sig||(q.skill+'|'+q.label+'|'+q.correct)); state.lastSkill=q.skill;
   state.current=q; renderQuestion(); updateHud();
   clearTimeout(window.__sp); if(state.phase===0||state.phase===4||q.label.length>34) window.__sp=setTimeout(()=>speakQuestion(false),420);
 }
@@ -1112,7 +1176,7 @@ function renderHome(first){
   const rec=recommendedLevel(p); if(first||window.__auto!==false) state.phase=rec;
   document.querySelectorAll('#phaseSelect .phase-btn').forEach((b,n)=>{
     const st=p?(p.stars[n]||0):0;
-    b.innerHTML=`<span>${LEVEL_ICON[n]} Nível ${n}</span><span class="ps">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</span>`+(p&&n===rec?'<span class="rtag">Para você</span>':'');
+    b.innerHTML=`<span>${LEVEL_ICON[n]} Nível ${n}</span><span class="sh">${CONFIG[n].short}</span><span class="ps">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</span>`+(p&&n===rec?'<span class="rtag">Para você</span>':'');
     b.classList.toggle('active',n===state.phase); b.classList.toggle('rec',!!p&&n===rec);
     b.onclick=()=>{ window.__auto=false; selectPhase(b,n); };
   });
