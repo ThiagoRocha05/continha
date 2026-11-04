@@ -703,11 +703,11 @@ const manyOf = (n, e) => rows5(Array(n).fill(e));
 
 // ---------- Nível 1: contar e comparar ----------
 Q.contar = (t) => { const o = pickObj(), n = by(t, [1,5], [4,9], [8,14]);
-  return { skill:'contar', sig:'c'+n, icon:o.e, modeTag:'Contando', label:`${Quant(o)} ${o.n} você vê?`, body:manyOf(n, o.e), options:distractors(n,3,Math.max(0,n-5),n+5), correct:n, explain:`Contando um por um, são ${n}.` }; };
+  return { skill:'contar', sig:'c'+n, icon:'🔢', modeTag:'Contando', label:`${Quant(o)} ${o.n} você vê?`, body:manyOf(n, o.e), options:distractors(n,3,Math.max(0,n-5),n+5), correct:n, explain:`Contando um por um, são ${n}.` }; };
 Q.contarMix = (t) => { const o1 = pickObj(), o2 = pickObj(o1); let a = by(t, [2,5], [3,7], [4,9]), b = by(t, [2,5], [3,7], [4,9]); while (b === a) b = by(t, [2,5], [3,7], [4,9]);
   const askFirst = Math.random() < .5, tgt = askFirst ? o1 : o2, n = askFirst ? a : b;
   const items = shuffle([...Array(a).fill(o1.e), ...Array(b).fill(o2.e)]);
-  return { skill:'contarMix', sig:'m'+a+'-'+b+(askFirst?'a':'b'), icon:tgt.e, modeTag:'Contando', label:`${Quant(tgt)} ${tgt.n} ${tgt.e} você vê?`, say:`${Quant(tgt)} ${tgt.n} você vê?`, body:rows5(items), options:distractors(n,3,Math.max(0,n-4),n+4), correct:n, explain:`Contando só ${tgt.n}, são ${n}.` }; };
+  return { skill:'contarMix', sig:'m'+a+'-'+b+(askFirst?'a':'b'), icon:'🔍', modeTag:'Contando', label:`${Quant(tgt)} ${tgt.n} ${tgt.e} você vê?`, say:`${Quant(tgt)} ${tgt.n} você vê?`, body:rows5(items), options:distractors(n,3,Math.max(0,n-4),n+4), correct:n, explain:`Contando só ${tgt.n}, são ${n}.` }; };
 Q.maisMenos = (t) => { const o = pickObj(); let a = by(t, [1,5], [2,8], [4,10]), b = by(t, [1,5], [2,8], [4,10]); const minDiff = t === 0 ? 2 : 1; let g = 0;
   while ((Math.abs(a - b) < minDiff) && g++ < 50) b = by(t, [1,5], [2,8], [4,10]);
   if (a === b) b = a + 2;
@@ -718,7 +718,7 @@ Q.maisMenos = (t) => { const o = pickObj(); let a = by(t, [1,5], [2,8], [4,10]),
 
 // ---------- Nível 2: somar e subtrair ----------
 Q.somarVis = (t) => { const o = pickObj(); const a = by(t, [1,4], [2,6], [3,7]), b = by(t, [1,4], [1,5], [2,6]), c = a + b;
-  return { skill:'somarVis', sig:'sv'+a+'+'+b, icon:o.e, modeTag:'Somando', label:`${Quant(o)} ${o.n} há ao todo?`, say:`${Quant(o)} ${o.n} há ao todo?`, body:`<div class="objects-row">${group(a,o.e)}${sym('+')}${group(b,o.e)}${sym('=')}<div class="eq-box">?</div></div>`, options:distractors(c,3,0,c+5), correct:c, explain:`${a} + ${b} = ${c}` }; };
+  return { skill:'somarVis', sig:'sv'+a+'+'+b, icon:'➕', modeTag:'Somando', label:`${Quant(o)} ${o.n} há ao todo?`, say:`${Quant(o)} ${o.n} há ao todo?`, body:`<div class="objects-row">${group(a,o.e)}${sym('+')}${group(b,o.e)}${sym('=')}<div class="eq-box">?</div></div>`, options:distractors(c,3,0,c+5), correct:c, explain:`${a} + ${b} = ${c}` }; };
 Q.somar = (t) => { let a, b; const lim = [6, 10, 18][t];
   do { a = rnd(1, t === 2 ? 9 : t === 1 ? 8 : 5); b = rnd(1, t === 2 ? 9 : t === 1 ? 8 : 4); } while (a + b > lim);
   const c = a + b, horiz = Math.random() < .5;
@@ -757,56 +757,56 @@ Q.pJuntar = (t) => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), a = by(
     `${p1.name} tem ${a} ${it.item}. ${p2.name} tem ${b}. ${Cap(quantos(it))} ${it.item} eles têm juntos?`,
     `${p1.name} guardou ${a} ${it.item} e ${p2.name} guardou ${b}. ${Cap(quantos(it))} ${it.item} eles guardaram ao todo?`,
     `Na caixa de ${p1.name} tem ${a} ${it.item}. Na caixa de ${p2.name} tem ${b}. ${Cap(quantos(it))} ${it.item} há nas duas caixas?`]);
-  return prob('pJuntar', 'pj'+a+'+'+b, it.emoji, 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
+  return prob('pJuntar', 'pj'+a+'+'+b, '📖', 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
 Q.pGanhar = (t) => { const p = person(), it = pick(WORD_ITEMS), a = by(t,[2,6],[3,9],[5,12]), b = by(t,[1,4],[2,6],[3,8]), c = a + b;
   const txt = pick([
     `${p.name} tinha ${a} ${it.item} e ganhou mais ${b}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
     `${p.name} tem ${a} ${it.item}. Ganhou ${b} de presente. ${Cap(quantos(it))} ${it.item} ${p.name} tem agora?`]);
-  return prob('pGanhar', 'pg'+a+'+'+b, it.emoji, 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
+  return prob('pGanhar', 'pg'+a+'+'+b, '📖', 'Problema', txt, c, `${a} + ${b} = ${c}`, 0, c + 6); };
 Q.pTirar = (t) => { const [p,q] = twoPeople(), it = pick(WORD_ITEMS), a = by(t,[4,8],[6,12],[9,18]), b = rnd(1, Math.min(a - 1, t === 0 ? 4 : 8)), c = a - b;
   const txt = pick([
     `${p.name} tinha ${a} ${it.item}. ${ela(p)} deu ${b} para ${q.name}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
     `${p.name} tinha ${a} ${it.item} e perdeu ${b}. Com ${quantos(it)} ${it.item} ${p.name} ficou?`,
     `${p.name} tinha ${a} ${it.item}. ${ela(p)} emprestou ${b} para ${q.name}. ${Cap(quantos(it))} ${it.item} ficaram com ${p.name}?`]);
-  return prob('pTirar', 'pt'+a+'-'+b, it.emoji, 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
+  return prob('pTirar', 'pt'+a+'-'+b, '📖', 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
 Q.pSobrar = (t) => { const p = person(), it = pick([{item:'maçãs',emoji:'🍎',g:'f'},{item:'bananas',emoji:'🍌',g:'f'},{item:'biscoitos',emoji:'🍪',g:'m'},{item:'pirulitos',emoji:'🍭',g:'m'},{item:'uvas',emoji:'🍇',g:'f'}]),
     a = by(t,[5,9],[7,13],[10,18]), b = rnd(1, Math.min(a - 1, t === 0 ? 4 : 8)), c = a - b;
   const txt = pick([
     `Em cima da mesa estavam ${a} ${it.item}. ${p.name} comeu ${b}. ${Cap(quantos(it))} sobraram?`,
     `A mamãe colocou ${a} ${it.item} na fruteira. ${p.name} pegou ${b}. ${Cap(quantos(it))} ${it.item} ficaram na fruteira?`]);
-  return prob('pSobrar', 'ps'+a+'-'+b, it.emoji, 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
+  return prob('pSobrar', 'ps'+a+'-'+b, '📖', 'Problema', txt, c, `${a} − ${b} = ${c}`, 0, a); };
 Q.pComparar = (t) => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), b = by(t,[2,6],[3,9],[4,11]), d = by(t,[1,3],[1,5],[2,7]), a = b + d;
   const txt = pick([
     `${p1.name} tem ${a} ${it.item} e ${p2.name} tem ${b}. ${p1.name} tem ${quantos(it)} ${it.item} a mais que ${p2.name}?`,
     `${p1.name} tem ${a} ${it.item}. ${p2.name} tem só ${b}. ${Cap(quantos(it))} ${it.item} ${p2.name} precisa ganhar para ficar com a mesma quantidade?`]);
-  return prob('pComparar', 'pc'+a+'-'+b, it.emoji, 'Problema', txt, d, `${a} − ${b} = ${d}`, 0, d + 7); };
+  return prob('pComparar', 'pc'+a+'-'+b, '📖', 'Problema', txt, d, `${a} − ${b} = ${d}`, 0, d + 7); };
 Q.pCompletar = (t) => { const p = person(), it = pick(WORD_ITEMS), tt = by(t,[6,10],[8,14],[10,18]), a = rnd(2, tt - 2), c = tt - a;
   const txt = pick([
     `${p.name} quer juntar ${tt} ${it.item}. Já tem ${a}. ${Cap(quantos(it))} ainda faltam?`,
     `Para completar o álbum ${p.name} precisa de ${tt} ${it.item}. ${ela(p)} já tem ${a}. ${Cap(quantos(it))} faltam?`]);
-  return prob('pCompletar', 'pp'+tt+'-'+a, it.emoji, 'Problema', txt, c, `${a} + ${c} = ${tt}`, 0, tt); };
+  return prob('pCompletar', 'pp'+tt+'-'+a, '📖', 'Problema', txt, c, `${a} + ${c} = ${tt}`, 0, tt); };
 Q.pGrupos = (t) => { const k = pick(t === 0 ? [2,3] : [2,3,5]), n = rnd(2, k === 5 ? 3 : 4), c = k * n, em = pick(['🍪','🍎','⭐','🍬']);
   const body = `<div class="objects-row">${Array.from({length:n}).map(()=>`<div class="object-group box">${objs(k,em)}</div>`).join('')}</div>`;
   const cont = pick([['prato','pratos'],['caixa','caixas'],['cesta','cestas']]), nome = em==='🍪'?'biscoitos':em==='🍎'?'maçãs':em==='⭐'?'estrelas':'balas';
-  return prob('pGrupos', 'pr'+n+'x'+k+em, em, 'Problema', `Tem ${n} ${cont[1]} com ${k} ${nome} em cada. ${Cap(quantos({g:(em==='🍪'?'m':'f')}))} ${nome} há ao todo?`, c, `${Array(n).fill(k).join(' + ')} = ${c}`, 0, c + 6, body); };
+  return prob('pGrupos', 'pr'+n+'x'+k+em, '📖', 'Problema', `Tem ${n} ${cont[1]} com ${k} ${nome} em cada. ${Cap(quantos({g:(em==='🍪'?'m':'f')}))} ${nome} há ao todo?`, c, `${Array(n).fill(k).join(' + ')} = ${c}`, 0, c + 6, body); };
 Q.pIdade = (t) => { const [p1,p2] = twoPeople(), a = rnd(5,9), d = rnd(1,3), mais = Math.random() < .5, c = mais ? a + d : a - d;
   return prob('pIdade', 'pi'+a+(mais?'+':'-')+d, '🎂', 'Problema', `${p1.name} tem ${a} anos. ${p2.name} tem ${d} ${d===1?'ano':'anos'} a ${mais?'mais':'menos'}. Quantos anos ${p2.name} tem?`, c, `${a} ${mais?'+':'−'} ${d} = ${c}`, 1, 14); };
 Q.pTurma = () => { const m = rnd(5,13), f = rnd(5,13), c = m + f;
   return prob('pTurma', 'pu'+m+'+'+f, '🏫', 'Problema', `Na turma há ${m} meninos e ${f} meninas. Quantas crianças há na turma?`, c, `${m} + ${f} = ${c}`, 5, 30); };
 Q.pDobro = () => { const [p1,p2] = twoPeople(), it = pick(WORD_ITEMS), a = rnd(2,9), c = a * 2;
-  return prob('pDobro', 'pd'+a, it.emoji, 'Problema', `${p1.name} tem ${a} ${it.item}. ${p2.name} tem o dobro. ${Cap(quantos(it))} ${it.item} ${p2.name} tem?`, c, `O dobro de ${a} é ${a} + ${a} = ${c}`, 0, 24); };
+  return prob('pDobro', 'pd'+a, '📖', 'Problema', `${p1.name} tem ${a} ${it.item}. ${p2.name} tem o dobro. ${Cap(quantos(it))} ${it.item} ${p2.name} tem?`, c, `O dobro de ${a} é ${a} + ${a} = ${c}`, 0, 24); };
 Q.pMetade = () => { const p = person(), it = pick(WORD_ITEMS), h = rnd(2,8), tt = h * 2;
-  return prob('pMetade', 'pm'+tt, it.emoji, 'Problema', `${p.name} tem ${tt} ${it.item} e quer repartir igualmente com 1 amigo. Cada um fica com ${quantos(it)}?`, h, `${h} + ${h} = ${tt}`, 0, 16); };
+  return prob('pMetade', 'pm'+tt, '📖', 'Problema', `${p.name} tem ${tt} ${it.item} e quer repartir igualmente com 1 amigo. Cada um fica com ${quantos(it)}?`, h, `${h} + ${h} = ${tt}`, 0, 16); };
 Q.pDuas = () => { const p = person(), it = pick(WORD_ITEMS); let a, b, c, r; do { a = rnd(4,10); b = rnd(2,7); c = rnd(2,9); r = a + b - c; } while (r < 1);
-  return prob('pDuas', 'p2'+a+b+c, it.emoji, 'Problema', `${p.name} tinha ${a} ${it.item}, ganhou ${b} e depois deu ${c}. Com ${quantos(it)} ${it.item} ficou?`, r, `${a} + ${b} = ${a+b} e ${a+b} − ${c} = ${r}`, 0, 20); };
+  return prob('pDuas', 'p2'+a+b+c, '📖', 'Problema', `${p.name} tinha ${a} ${it.item}, ganhou ${b} e depois deu ${c}. Com ${quantos(it)} ${it.item} ficou?`, r, `${a} + ${b} = ${a+b} e ${a+b} − ${c} = ${r}`, 0, 20); };
 Q.pOnibus = () => { const a = rnd(6,14), d = rnd(1,5), s = rnd(1,6), c = a - d + s;
   return prob('pOnibus', 'po'+a+d+s, '🚌', 'Problema', `Dentro do ônibus estavam ${a} pessoas. Desceram ${d} e subiram ${s}. Quantas pessoas ficaram no ônibus?`, c, `${a} − ${d} = ${a-d} e ${a-d} + ${s} = ${c}`, 1, 25); };
 
 // ---------- Nível 5: números e formas ----------
 Q.dezUni = (t) => { const tt = by(t,[1,2],[1,4],[2,5]), u = rnd(0,9), n = tt*10 + u, form = t === 0 ? 'blocos' : pick(['blocos','texto','texto2']);
-  if (form === 'blocos') return { skill:'dezUni', sig:'du'+n, icon:'🧱', modeTag:'Dezena e unidade', label:'Que número é este? Cada barra vale 10.', say:'Que número é este? Cada barra vale dez.', body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} = ${n}` };
-  if (form === 'texto') return { skill:'dezUni', sig:'du'+n, icon:'🧱', modeTag:'Dezena e unidade', label:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} formam qual número?`, body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt*10} + ${u} = ${n}` };
-  return { skill:'dezUni', sig:'dd'+n, icon:'🧱', modeTag:'Dezena e unidade', label:`No número ${n}, quantas dezenas há?`, body:eqRow(nb(n)), options:distractors(tt,3,0,9), correct:tt, explain:`${n} tem ${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'}.` }; };
+  if (form === 'blocos') return { skill:'dezUni', sig:'du'+n, icon:'🔢', modeTag:'Dezena e unidade', label:'Que número é este? Cada barra vale 10.', say:'Que número é este? Cada barra vale dez.', body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} = ${n}` };
+  if (form === 'texto') return { skill:'dezUni', sig:'du'+n, icon:'🔢', modeTag:'Dezena e unidade', label:`${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'} formam qual número?`, body:blocksHTML(tt,u), options:distractors(n,3,10,n+12), correct:n, explain:`${tt*10} + ${u} = ${n}` };
+  return { skill:'dezUni', sig:'dd'+n, icon:'🔢', modeTag:'Dezena e unidade', label:`No número ${n}, quantas dezenas há?`, body:eqRow(nb(n)), options:distractors(tt,3,0,9), correct:tt, explain:`${n} tem ${tt} ${tt===1?'dezena':'dezenas'} e ${u} ${u===1?'unidade':'unidades'}.` }; };
 Q.antSuc = (t) => { const n = by(t,[3,19],[10,50],[20,89]), k = pick(['dep','ant','ent']);
   if (k === 'dep') return { skill:'antSuc', sig:'ad'+n, icon:'➡️', modeTag:'Antes e depois', label:`Qual número vem DEPOIS do ${n}?`, body:eqRow(nb(n)+sym('→')+nb('?',1)), options:distractors(n+1,3,1,n+8), correct:n+1, explain:`Depois do ${n} vem o ${n+1}.` };
   if (k === 'ant') return { skill:'antSuc', sig:'aa'+n, icon:'⬅️', modeTag:'Antes e depois', label:`Qual número vem ANTES do ${n}?`, body:eqRow(nb('?',1)+sym('→')+nb(n)), options:distractors(n-1,3,0,n+6), correct:n-1, explain:`Antes do ${n} vem o ${n-1}.` };
@@ -837,7 +837,7 @@ Q.saltos = () => { const step = pick([2,5,10]), start = step === 10 ? rnd(0,5)*1
 Q.dinheiro = (t) => { const n = by(t,[2,3],[2,3],[3,4]), pool = t === 0 ? [1,2] : t === 1 ? [1,2,5] : [1,2,5,10], vals = Array.from({length:n},()=>pick(pool)), tt = vals.reduce((a,b)=>a+b,0);
   return { skill:'dinheiro', sig:'di'+vals.join(','), icon:'💰', modeTag:'Dinheiro', label:'Quanto dinheiro há aqui?', body:`<div class="objects-row money-row">${vals.map(moneyChip).join('')}</div>`, options:distractors(tt,3,1,tt+8), correct:tt, fmt:v=>`R$ ${v}`, say:'Quanto dinheiro há aqui? Some tudo.', explain:`${vals.join(' + ')} = ${tt} reais.` }; };
 Q.troco = () => { const it = pick([['um pirulito','🍭'],['um caderno','📓'],['uma bola','⚽'],['um suco','🧃'],['um lápis','✏️'],['um sorvete','🍦'],['uma fita','🎀']]), preco = rnd(1,8), pago = preco <= 5 ? pick([5,10]) : 10, tt = pago - preco, p = person();
-  return prob('troco', 'tr'+it[1]+preco+pago, it[1], 'Dinheiro', `${p.name} comprou ${it[0]} por R$ ${preco}. Pagou com R$ ${pago}. Quanto ${p.g==='f'?'ela':'ele'} recebeu de troco?`, tt, `${pago} − ${preco} = ${tt} reais.`, 0, 12, `<div class="objects-row money-row">${moneyChip(pago===10?10:5)}</div>`); };
+  return prob('troco', 'tr'+it[1]+preco+pago, '💰', 'Dinheiro', `${p.name} comprou ${it[0]} por R$ ${preco}. Pagou com R$ ${pago}. Quanto ${p.g==='f'?'ela':'ele'} recebeu de troco?`, tt, `${pago} − ${preco} = ${tt} reais.`, 0, 12, `<div class="objects-row money-row">${moneyChip(pago===10?10:5)}</div>`); };
 Q.relogio = () => { const h = rnd(1,12);
   return { skill:'relogio', sig:'rl'+h, icon:'🕒', modeTag:'Relógio', label:'Que horas são? (ponteiro grande no 12)', say:'Que horas são? O ponteiro grande está no doze.', body:`<div class="objects-row">${clockSVG(h)}</div>`, options:distractors(h,3,1,12), correct:h, fmt:v=>`${v} ${v===1?'hora':'horas'}`, explain:`O ponteiro pequeno está no ${h}: são ${h} ${h===1?'hora':'horas'}.` }; };
 Q.calendario = () => { const k = pick(['dia','antes','mes','sem']);
@@ -889,7 +889,7 @@ const DIGITS = {
   9:[[[70,30],[62,14],[48,10],[34,16],[28,32],[34,46],[50,52],[66,46],[72,30],[72,60],[66,80],[52,90],[36,88],[28,78]]]
 };
 Q.escrever = () => { if(!state.digitPool||!state.digitPool.length) state.digitPool=shuffle([0,1,2,3,4,5,6,7,8,9]); const d=state.digitPool.pop(), o=pickObj();
-  return { skill:'escrever', sig:'e'+d, kind:'trace', digit:d, icon:o.e, modeTag:'Escrever número', label:`Escreva o número ${d} (${numWord(d)})`, say:`${numWord(d)}. O número ${numWord(d)}.`,
+  return { skill:'escrever', sig:'e'+d, kind:'trace', digit:d, icon:'✏️', modeTag:'Escrever número', label:`Escreva o número ${d} (${numWord(d)})`, say:`Escreva o número ${numWord(d)}.`,
     body:d ? manyOf(d,o.e) : '<div class="word-text">Zero: nenhum objeto</div>', options:[], correct:d, explain:`${d} é ${numWord(d)}.` }; };
 
 const TR = { raf:0, cv:null, ctx:null, strokes:[], dens:[], idx:0, cur:[], drawing:false, fails:0, done:true, t0:0, size:300, dpr:1 };
@@ -932,7 +932,6 @@ function traceSuccess(){
   TR.done=true; TR.cv.classList.add('ok'); trDraw(true);
   state.locked=true; const pts=awardCorrect(); const pr=P(); if(pr) pr.traceOk++;
   spawnParticles(TR.cv,['✨','⭐','🎉','💫']); vibrate([30]);
-  setTimeout(()=>speak(state.current.say,{rate:0.85}),300);
   setTimeout(()=>showFeedback(true,pts),1500);
 }
 function trDraw(finished){
