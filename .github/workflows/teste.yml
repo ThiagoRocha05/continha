@@ -1,0 +1,21 @@
+name: Teste dos geradores
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sintaxe do JavaScript
+        run: |
+          node -e "const h=require('fs').readFileSync('index.html','utf8');const m=h.match(/<script>([\s\S]*?)<\/script>/);new Function(m[1]);console.log('JS ok')"
+      - name: Geradores no navegador
+        run: |
+          npm i playwright@1.49.0
+          npx playwright install --with-deps chromium
+          node tests/geradores.js

@@ -10,9 +10,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Continhas">
 <title>Continhas 🔢</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=ABeeZee:ital@0;1&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
+/* fontes locais (OFL-1.1), sem pedir nada a servidores externos */
+@font-face{font-family:'Nunito';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/nunito-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/nunito-latin-700-normal.woff2) format('woff2');}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:900;font-display:swap;src:url(fonts/nunito-latin-900-normal.woff2) format('woff2');}
+@font-face{font-family:'ABeeZee';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/abeezee-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:'ABeeZee';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/abeezee-latin-400-italic.woff2) format('woff2');}
   :root {
     --coral:    #FF6B6B;
     --yellow:   #FFE66D;
@@ -1202,8 +1206,8 @@ function openStickers(){
 }
 let parentAnswer=0;
 function openParents(){
-  const a=4+Math.floor(Math.random()*6), b=4+Math.floor(Math.random()*6); parentAnswer=a+b;
-  openOv(`<h2>👨‍👩‍👧 Área dos adultos</h2><p class="sub">Para entrar, responda: quanto é <b>${a} + ${b}</b>?</p><input class="ov-input" id="pgAns" inputmode="numeric" maxlength="3" placeholder="?" autocomplete="off"><div id="pgMsg" class="sub" style="min-height:20px"></div><button class="ov-btn" data-act="pgok">Entrar</button><button class="ov-btn ghost" data-act="close">Voltar</button>`);
+  const a=6+Math.floor(Math.random()*4), b=6+Math.floor(Math.random()*4); parentAnswer=a*b;
+  openOv(`<h2>👨‍👩‍👧 Área dos adultos</h2><p class="sub">Para entrar, responda: quanto é <b>${a} × ${b}</b>?</p><input class="ov-input" id="pgAns" inputmode="numeric" maxlength="3" placeholder="?" autocomplete="off"><div id="pgMsg" class="sub" style="min-height:20px"></div><button class="ov-btn" data-act="pgok">Entrar</button><button class="ov-btn ghost" data-act="close">Voltar</button>`);
   setTimeout(()=>{ const i=document.getElementById('pgAns'); if(i) i.focus(); },80);
 }
 function renderParents(){
@@ -1239,6 +1243,7 @@ document.getElementById('ov').addEventListener('keydown',e=>{ if(e.key!=='Enter'
 
 // ---------- início ----------
 (function init(){
+  try{ navigator.storage?.persist?.(); }catch(e){}
   const sf=document.getElementById('starField'); for(let i=0;i<40;i++){ const s=document.createElement('div'); s.className='star'; s.style.left=rnd(0,100)+'vw'; s.style.top=rnd(0,100)+'vh'; s.style.animationDelay=(Math.random()*3).toFixed(2)+'s'; sf.appendChild(s); }
   updateSoundBtn(); loadVoices();
   if(!P()&&DB.profiles.length===1) DB.cur=DB.profiles[0].id;
