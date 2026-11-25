@@ -1,16 +1,39 @@
 # Continhas
 
-Jogo gratuito de matemática para crianças do 1º ano do Ensino Fundamental. Roda no navegador, sem anúncios, sem cadastro e sem coletar dados. O progresso fica só no aparelho.
+Jogo gratuito de matemática para crianças de 5 a 7 anos, alinhado ao conteúdo do 1º ano do Ensino Fundamental. Roda direto no navegador do tablet, do celular ou do computador, e pode ser instalado na tela inicial como um aplicativo.
 
-Jogar: https://thiagorocha05.github.io/continha/
+**Jogar:** https://thiagorocha05.github.io/continha/
 
 ## Níveis
-0. Escrever números com o dedo (0 a 9)
-1. Contando
-2. Continhas (somar e subtrair com figuras e armadas)
-3. Desafio (dezenas, tripla, sequências)
-4. Probleminhas do dia a dia (mais de 20 tipos)
-5. Números e formas (antecessor, sucessor, comparar, par e ímpar, formas)
-6. Mundo real (dinheiro, troco, relógio, calendário, gráficos, medidas)
 
-Jogo adaptativo: repete mais o que a criança erra. Perfis, figurinhas, voz em português, área dos adultos com acertos por habilidade, modo tranquilo e instalação como app.
+0. **Escrever números:** traçar os números de 0 a 9 com o dedo.
+1. **Contando:** contar figuras.
+2. **Continhas:** somar e subtrair com figuras e com a conta armada.
+3. **Desafio:** dezenas, somas de três números e sequências.
+4. **Probleminhas:** mais de 20 tipos de situações do dia a dia.
+5. **Números e formas:** antecessor, sucessor, maior e menor, par e ímpar, formas geométricas.
+6. **Mundo real:** dinheiro e troco, relógio, calendário, gráficos e medidas.
+
+Cada nível tem três faixas de dificuldade.
+
+## Como funciona
+
+- O jogo repete mais o que a criança erra e evita repetir a mesma pergunta.
+- Voz em português lê as perguntas para quem ainda não lê sozinho.
+- Perfil separado para cada criança, com figurinhas.
+- Área dos adultos com os acertos por habilidade e o modo tranquilo, em que a criança não perde vidas.
+
+## Instalar como aplicativo
+
+- **Android (Chrome):** abra o link, toque no menu de três pontos e escolha "Adicionar à tela inicial".
+- **iPhone e iPad (Safari):** abra o link, toque em Compartilhar e escolha "Adicionar à Tela de Início".
+
+Depois de instalado, o jogo abre em tela cheia e funciona mesmo sem internet.
+
+## Privacidade
+
+O progresso fica salvo só no próprio aparelho. Não há cadastro, anúncios, rastreamento nem envio de dados para lugar nenhum.
+
+## Autor
+
+Criado por Thiago Rocha para as filhas dele e para outras famílias. Mais conteúdo de tecnologia para pais no Instagram [@paitechbr](https://www.instagram.com/paitechbr/).
