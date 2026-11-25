@@ -1,6 +1,6 @@
 # Continhas
 
-Jogo gratuito de matemática para crianças de 5 a 7 anos, alinhado ao conteúdo do 1º ano do Ensino Fundamental. Roda direto no navegador do tablet, do celular ou do computador, e pode ser instalado na tela inicial como um aplicativo.
+Jogo gratuito de matemática para crianças de 5 a 7 anos, com base no conteúdo que as crianças veem no 1º ano do Ensino Fundamental. É um complemento para brincar em casa e não substitui a escola. Roda direto no navegador do tablet, do celular ou do computador, e pode ser instalado na tela inicial como um aplicativo.
 
 **Jogar:** https://thiagorocha05.github.io/continha/
 
@@ -28,11 +28,13 @@ Cada nível tem três faixas de dificuldade.
 - **Android (Chrome):** abra o link, toque no menu de três pontos e escolha "Adicionar à tela inicial".
 - **iPhone e iPad (Safari):** abra o link, toque em Compartilhar e escolha "Adicionar à Tela de Início".
 
-Depois de instalado, o jogo abre em tela cheia e funciona mesmo sem internet.
+Depois de instalado, o jogo abre em tela cheia. Depois da primeira abertura com internet, funciona mesmo offline.
+
+Sem som? Confira se o aparelho tem uma voz em português instalada nas configurações de texto para fala. No iPhone, a voz começa depois do primeiro toque na tela.
 
 ## Privacidade
 
-O progresso fica salvo só no próprio aparelho. Não há cadastro, anúncios, rastreamento nem envio de dados para lugar nenhum.
+O progresso fica salvo só no próprio aparelho. Não há cadastro, anúncios nem rastreamento, e o jogo não coleta nenhum dado da criança. A voz usa o leitor de texto do aparelho; quando o navegador só oferece uma voz online, o jogo deixa de falar o nome da criança.
 
 ## Autor
 

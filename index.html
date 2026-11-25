@@ -967,13 +967,18 @@ window.addEventListener('resize',()=>{ if(TR.cv&&TR.cv.isConnected) sizeTrace();
 let soundOn=(function(){try{return localStorage.getItem('continha_sound')!=='off';}catch(e){return true;}})();
 let __voices=[];
 function loadVoices(){ if(!('speechSynthesis' in window)) return; __voices=speechSynthesis.getVoices(); if(!__voices.length) speechSynthesis.onvoiceschanged=()=>{__voices=speechSynthesis.getVoices();}; }
-function pickVoice(){ if(!__voices.length) __voices=speechSynthesis.getVoices(); return __voices.find(v=>v.lang==='pt-BR')||__voices.find(v=>v.lang&&v.lang.startsWith('pt'))||null; }
+function pickVoice(){ if(!__voices.length) __voices=speechSynthesis.getVoices(); const L=__voices.filter(v=>v.localService); return L.find(v=>v.lang==='pt-BR')||L.find(v=>v.lang&&v.lang.startsWith('pt'))||__voices.find(v=>v.lang==='pt-BR')||__voices.find(v=>v.lang&&v.lang.startsWith('pt'))||null; }
+// Vozes "online" (ex.: Google no Chrome de computador) mandam o texto para um servidor.
+// Por isso preferimos vozes locais e, se só houver voz online, o nome da criança não é falado.
+function __semNomes(t){ try{ (DB.profiles||[]).forEach(p=>{ if(!p||!p.name) return; const n=p.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  t=t.replace(new RegExp(',\\s*'+n+'(?=\\s*[!.?])','gi'),'').replace(new RegExp('\\b'+n+'\\b','gi'),'a criança'); }); }catch(e){} return t; }
+
 function speak(text,opts={}){
   const {rate=0.9,force=false}=opts; if(!force&&!soundOn) return; if(!('speechSynthesis' in window)) return;
   try{ const ss=speechSynthesis; ss.cancel(); const tok=(window.__spTok=(window.__spTok||0)+1);
     setTimeout(()=>{ if(tok!==window.__spTok) return; try{
-      const u=new SpeechSynthesisUtterance(String(text).replace(/−/g,' menos ').replace(/\+/g,' mais ').replace(/R\$\s*/g,' reais '));
-      const v=pickVoice(); if(v) u.voice=v; u.lang=v?v.lang:'pt-BR'; u.rate=rate; u.pitch=1.05; window.__spLast=u; if(ss.paused) ss.resume(); ss.speak(u); }catch(e){} },70);
+      const v=pickVoice(); const tx=(v&&v.localService)?String(text):__semNomes(String(text));
+      const u=new SpeechSynthesisUtterance(tx.replace(/−/g,' menos ').replace(/\+/g,' mais ').replace(/R\$\s*/g,' reais ')); if(v) u.voice=v; u.lang=v?v.lang:'pt-BR'; u.rate=rate; u.pitch=1.05; window.__spLast=u; if(ss.paused) ss.resume(); ss.speak(u); }catch(e){} },70);
   }catch(e){}
 }
 function toggleSound(){ soundOn=!soundOn; try{localStorage.setItem('continha_sound',soundOn?'on':'off');}catch(e){} updateSoundBtn(); if(soundOn) speak('Som ligado',{force:true}); else if('speechSynthesis' in window) speechSynthesis.cancel(); }
@@ -1220,7 +1225,7 @@ function renderParents(){
     const lv=LEVELS.map(n=>`N${n}: ${'⭐'.repeat(p.stars[n]||0)||'-'}`).join(' · ');
     return `<div class="pn-card"><h3><span>${p.av}</span>${esc(p.name)}</h3><div class="pn-grid"><div><b>${p.games}</b><span>jogos</span></div><div><b>${acc}%</b><span>acertos</span></div><div><b>${masteredSkills(p)}</b><span>habilidades dominadas</span></div><div><b>${new Set(p.days).size}</b><span>dias jogados</span></div><div><b>${p.streak}</b><span>dias seguidos</span></div><div><b>${p.stickers.length}</b><span>figurinhas</span></div></div><div class="pn-train">${lv}</div><div class="pn-train"><b>Para treinar:</b> ${weak}</div><details class="pn-det"><summary>Ver todas as habilidades</summary>${bars}</details><label class="pn-opt"><input type="checkbox" data-nolives="${esc(p.id)}" ${p.noLives?'checked':''}> Modo tranquilo (sem perder vidas)</label><div class="pn-acts"><button class="ov-btn ghost" data-reset="${esc(p.id)}">Zerar progresso</button><button class="ov-btn danger" data-del="${esc(p.id)}">Remover jogador</button></div></div>`;
   }).join('');
-  openOv(`<h2>👨‍👩‍👧 Área dos adultos</h2><p class="sub">Os dados ficam somente neste aparelho. Nada é enviado nem coletado.</p>${cards}<button class="ov-btn" data-act="close">Fechar</button>`);
+  openOv(`<h2>👨‍👩‍👧 Área dos adultos</h2><p class="sub">O progresso fica somente neste aparelho. O jogo não coleta nenhum dado da criança.</p>${cards}<button class="ov-btn" data-act="close">Fechar</button>`);
 }
 const armed={};
 document.getElementById('ov').addEventListener('click',e=>{
